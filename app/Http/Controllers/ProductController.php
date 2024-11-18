@@ -44,8 +44,7 @@ class ProductController extends Controller
                 'createdAt' => now(),
                 'updatedAt' => now(),
             ]);
-
-         
+          
             if ($request->hasFile('productImages')) {
                 foreach ($request->file('productImages') as $image) {
                     $uploadedFile = Cloudinary::upload($image->getRealPath(), [
@@ -79,42 +78,62 @@ class ProductController extends Controller
         }
     }
 
-    public function suaSanPham(Request $request, $id)
+    public function suaSanPham(Request $request)
     {
-        $product = Product::findOrFail($id); 
-
-      
-        if ($request->hasFile('image')) {
-            
-            if ($product->productImages->count() > 0) {
-                $oldImage = $product->productImages->first();
-                cloudinary()->destroy($oldImage->image_url); 
-                $oldImage->delete();
-            }
-
-          
-            $image = $request->file('image');
-            $uploadedFile = cloudinary()->upload($image->getRealPath(), [
-                'folder' => 'products',
+       
+        try {
+            // Lấy thông tin sản phẩm từ ID trong request
+            $product = Product::findOrFail($request->input('id'));
+           
+            // Cập nhật thông tin cơ bản của sản phẩm
+            $product->update([
+                'productName' => $request->input('productName'),
+                'ID_SupCategory' => $request->input('subCategoryID'),
+                'description' => $request->input('description'),
+                'updatedAt' => now(),
             ]);
 
-            // Lưu ảnh mới vào cơ sở dữ liệu
-            $productImage = new ProductImage();
-            $productImage->ProductID = $product->id;
-            $productImage->IMG_URL = $uploadedFile->getSecurePath(); // Lưu URL của ảnh
-            $productImage->save();
+            // Kiểm tra nếu có ảnh mới
+            if ($request->hasFile('productImages')) {
+
+                if ($product->productImages->count() > 0) {
+                    foreach ($product->productImages as $oldImage) {
+                        cloudinary()->destroy($oldImage->IMG_URL); // Xóa ảnh trên Cloudinary
+                        $oldImage->delete(); // Xóa bản ghi trong cơ sở dữ liệu
+                    }
+                }
+
+                // Tải lên và lưu ảnh mới
+                foreach ($request->file('productImages') as $image) {
+                    $uploadedFile = Cloudinary::upload($image->getRealPath(), [
+                    'folder' => 'products',
+                    ]);
+                    
+                    if ($uploadedFile) {
+                        $imageUrl = $uploadedFile->getSecurePath(); // Lấy URL an toàn
+                        ProductImage::create([
+                            'ProductID' => $product->id,
+                            'IMG_URL' => $imageUrl,
+                        ]);
+                    } 
+                }
+            }
+            
+            
+
+            // Phản hồi sau khi cập nhật thành công
+            return redirect()->back()->with('success', 'Thành công');
+        
+        } catch (\Exception $e) {
+            // Xử lý lỗi và trả về phản hồi lỗi
+            return response()->json([
+                'message' => 'Có lỗi xảy ra khi cập nhật sản phẩm!',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        // Cập nhật thông tin sản phẩm
-        $product->update([
-            'productName' => $request->input('productName'),
-            'description' => $request->input('description'),
-            'isDelete' => $request->input('isDelete'),
-            'updatedAt' => now(),
-        ]);
-
-        return response()->json(['message' => 'Sản phẩm đã được cập nhật thành công']);
     }
+
+    
 
 
     public function xoaSanPham($id)
@@ -130,7 +149,6 @@ class ProductController extends Controller
      
         $product->delete();
 
-        return response()->json(['message' => 'Sản phẩm đã được xóa thành công']);
+        return redirect()->back()->with('success', 'Thành công');
     }
-
 }
