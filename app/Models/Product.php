@@ -20,6 +20,7 @@ class Product extends Model
         'updatedAt'
     ];
 
+    public $timestamps = false;
     // Khai báo mối quan hệ với bảng 'supcategory'
     public function subCategory()
     {

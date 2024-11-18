@@ -15,7 +15,7 @@ class ProductImage extends Model
         'ProductID',
         'IMG_URL'
     ];
-
+    public $timestamps = false;
     // Khai báo mối quan hệ với bảng 'product'
     public function product()
     {
