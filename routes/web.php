@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::get('/login', function () {
     return view('sign-in');
 });
+
+Route::post('/register',[App\Http\Controllers\AdminController::class,'register']);
+Route::post('/login',[App\Http\Controllers\AdminController::class,'login']);
