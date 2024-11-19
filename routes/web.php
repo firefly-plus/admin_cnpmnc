@@ -29,4 +29,6 @@ Route::get('/statistics.html', [App\Http\Controllers\AdminController::class, 'St
 Route::post('/statistics/revenue', [App\Http\Controllers\AdminController::class, 'getRevenueData'])->name('statistics.revenue');
 
 Route::get('/promotion-management.html', [App\Http\Controllers\AdminController::class, 'showPromotion']);
-
+Route::get('/getdiscount', [App\Http\Controllers\AdminController::class, 'getDiscount']);
+Route::get('/getproductvariationbycategory', [App\Http\Controllers\AdminController::class, 'getProductVariationByCate']);
+Route::get('/getproductvariationbysubcategory', [App\Http\Controllers\AdminController::class, 'getProductVariationBySubCate']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Discount;
 use App\Models\Employee;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
@@ -66,10 +67,10 @@ class AdminController extends Controller
 
     public function exportPdf(Request $request)
     {
-        try {
-            $selectedInvoices = $request->input('invoices'); // Lấy danh sách hóa đơn đã chọn từ request
+        try 
+        {
+            $selectedInvoices = $request->input('invoices'); 
     
-            // Convert to array if it is a string (in case it's a single invoice ID)
             if (is_string($selectedInvoices)) {
                 $selectedInvoices = explode(',', $selectedInvoices);
             }
@@ -77,20 +78,19 @@ class AdminController extends Controller
             if (empty($selectedInvoices)) {
                 return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một hóa đơn!');
             }
-        
-            // Lấy hóa đơn từ cơ sở dữ liệu
+
             $invoices = Invoice::with('invoiceDetails.productVariation.product')
                                 ->whereIn('id', $selectedInvoices)
                                 ->get();
             
             Log::debug('Retrieved invoices: ', $invoices->toArray());
             
-            // Tạo file PDF và lưu vào thư mục public/pdf
+           
             $pdfPath = public_path('pdf/hoadon.pdf');
             $pdf = Pdf::loadView('invoice.pdf', compact('invoices'));
             $pdf->save($pdfPath);
         
-            // Trả về URL của file PDF để client tải về
+            
             return response()->json(['pdfPath' => asset('pdf/hoadon.pdf')], 200);
         } catch (\Exception $e) {
             Log::error('Lỗi xuất PDF: ' . $e->getMessage());
@@ -197,7 +197,7 @@ class AdminController extends Controller
             Log::info('Processing product variation:', ['product' => $product->productName]);
         
             foreach($Invoices_Des as $Invoices_De) {
-                // Check the relationship and field values
+            
                 Log::info('Checking invoice detail:', [
                     'product_variation_id' => $product->id,
                     'invoice_detail_product_variation_id' => $Invoices_De->ID_productVariation,
@@ -218,8 +218,8 @@ class AdminController extends Controller
         
             Log::info('Revenue for product:', ['product' => $product->productName, 'revenue' => $sumByPro]);
         }
-        $revenueByCategory = collect($revenueByCategory); // Chuyển thành Collection
-        $revenueByProduct = collect($revenueByProduct);   // Chuyển thành Collection
+        $revenueByCategory = collect($revenueByCategory); //
+        $revenueByProduct = collect($revenueByProduct);   
         return view('statistics.index', compact(
             'userCount',
             'sum_today',
@@ -227,13 +227,10 @@ class AdminController extends Controller
             'sum_iv_today',
             'now',
             'year',
-            'revenueByCategory', // Changed this variable name to match the view
-            'revenueByProduct' // Added the revenueByProduct to the view
+            'revenueByCategory', 
+            'revenueByProduct' 
         ));
     }
-
-
-    
 
     public function getRevenueData(Request $request)
     {
@@ -294,8 +291,38 @@ class AdminController extends Controller
     //Promotion
     public function showPromotion()
     {
-        return view('promotion.management-promotion');
+        return view('promotion.promotion-management');
     }
+
+    public function getDiscount()
+    {
+        $discount=Discount::all();
+        return response()->json($discount);
+    }
+
+    public function getProductVariationByCate(Request $request)
+    {
+        $productVariations = ProductVariation::with('product') 
+            ->whereHas('product.subCategory.category', function ($query) use ($request) {
+                $query->where('id', $request->id);
+            })
+            ->get();
+
+        return response()->json($productVariations); 
+    }
+
+    public function getProductVariationBySubCate(Request $request)
+    {
+        $productVariations = ProductVariation::with('product') 
+            ->whereHas('product.subCategory', function ($query) use ($request) {
+                $query->where('id', $request->id); 
+            })
+            ->get();
+
+        return response()->json($productVariations); 
+    }
+
+
 
 
     
