@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Discount;
 use App\Models\Employee;
 use App\Models\Invoice;
@@ -10,6 +11,7 @@ use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\SupCategory;
 use App\Models\User;
+use App\Models\VariationDiscount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
@@ -302,25 +304,126 @@ class AdminController extends Controller
 
     public function getProductVariationByCate(Request $request)
     {
-        $productVariations = ProductVariation::with('product') 
+        $productVariations = ProductVariation::with('product', 'product.productImages')
             ->whereHas('product.subCategory.category', function ($query) use ($request) {
                 $query->where('id', $request->id);
             })
             ->get();
-
-        return response()->json($productVariations); 
+        $discounts = Discount::all();
+    
+        $filteredProductVariations = [];
+        foreach ($productVariations as $productVariation) {
+            $hasDiscount = false;
+            foreach ($discounts as $discount) {
+                if ($discount->ID_ProductVariation == $productVariation->id) {
+                    $hasDiscount = true;
+                    break; 
+                }
+            }
+            if (!$hasDiscount) {
+                $filteredProductVariations[] = $productVariation;
+            }
+        }
+    
+        return response()->json($filteredProductVariations);
     }
-
+    
     public function getProductVariationBySubCate(Request $request)
     {
-        $productVariations = ProductVariation::with('product') 
+        $productVariations = ProductVariation::with('product', 'product.productImages')
             ->whereHas('product.subCategory', function ($query) use ($request) {
-                $query->where('id', $request->id); 
+                $query->where('id', $request->id);
             })
             ->get();
-
-        return response()->json($productVariations); 
+        $discounts = Discount::all();
+        $filteredProductVariations = [];
+        foreach ($productVariations as $productVariation) {
+            $hasDiscount = false;
+            foreach ($discounts as $discount) {
+                if ($discount->ID_ProductVariation == $productVariation->id) {
+                    $hasDiscount = true;
+                    break; 
+                }
+            }
+            if (!$hasDiscount) {
+                $filteredProductVariations[] = $productVariation;
+            }
+        }
+    
+        return response()->json($filteredProductVariations);
     }
+    
+    public function getProductVariationByProduct(Request $request)
+    {
+        $productVariations = ProductVariation::with('product', 'product.productImages')
+            ->where('ID_Product', $request->id)
+            ->get();
+    
+        $discounts = Discount::all();
+        $filteredProductVariations = [];
+        foreach ($productVariations as $productVariation) {
+            $hasDiscount = false;
+            foreach ($discounts as $discount) {
+                if ($discount->ID_ProductVariation == $productVariation->id) {
+                    $hasDiscount = true;
+                    break; 
+                }
+            }
+            if (!$hasDiscount) {
+                $filteredProductVariations[] = $productVariation;
+            }
+        }
+    
+        return response()->json($filteredProductVariations);
+    }
+    
+
+    public function getCategory()
+    {
+        $category=Category::all();
+        return response()->json($category);
+    }
+
+    public function getSubCategory()
+    {
+        $subCategory=SupCategory::all();
+        return response()->json($subCategory);
+    }
+
+    public function getProduct()
+    {
+        $product=Product::all();
+        return response()->json($product);
+    }
+
+    public function getProductVariationDiscount(Request $request)
+    {
+        $productVariations = ProductVariation::with('product', 'product.productImages','variationdiscount.discount')->get();
+        $variationDiscounts = VariationDiscount::all();
+        $filteredProductVariations = [];
+        foreach ($productVariations as $productVariation) {
+            foreach ($variationDiscounts as $variationDiscount) {
+                if ($variationDiscount->ID_Variation == $productVariation->id) {
+                    $filteredProductVariations[] = $productVariation;
+                    break; 
+                }
+            }
+        }
+        return response()->json($filteredProductVariations);
+    }
+
+    public function deleteDiscountByProductVariation(Request $request)
+    {
+        Log::info('ID received: ' . $request->id);
+        $variationDiscount = VariationDiscount::where('ID_Variation', $request->id)->first();
+        if (!$variationDiscount) {
+            return response()->json(['message' => 'Không tìm thấy khuyến mãi cho sản phẩm này.'], 404);
+        }
+        $variationDiscount->delete();
+        return response()->json(['message' => 'Khuyến mãi đã được hủy thành công.'], 200);
+    }
+
+
 
 
 

@@ -57,6 +57,9 @@
             class="app-menu__label">Quản lý nhân viên</span></a></li>
       <li><a class="app-menu__item" href="#"><i class='app-menu__icon bx bx-user-voice'></i><span
             class="app-menu__label">Quản lý khách hàng</span></a></li>
+      <li><a class="app-menu__item" href="promotion-management.html"><i
+              class='app-menu__icon fas fa-tags'></i><span>Quản lý khuyến mãi</span></a>
+      </li>
       <li><a class="app-menu__item" href="table-data-product.html"><i
             class='app-menu__icon bx bx-purchase-tag-alt'></i><span class="app-menu__label">Quản lý sản phẩm</span></a>
       </li>

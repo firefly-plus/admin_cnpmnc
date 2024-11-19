@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/admin', function () {
     return view('sign-in');
 });
+//
 
 
 Route::post('/login',[App\Http\Controllers\AdminController::class,'login']);
@@ -32,3 +33,9 @@ Route::get('/promotion-management.html', [App\Http\Controllers\AdminController::
 Route::get('/getdiscount', [App\Http\Controllers\AdminController::class, 'getDiscount']);
 Route::get('/getproductvariationbycategory', [App\Http\Controllers\AdminController::class, 'getProductVariationByCate']);
 Route::get('/getproductvariationbysubcategory', [App\Http\Controllers\AdminController::class, 'getProductVariationBySubCate']);
+Route::get('/getproductvariationbyproduct', [App\Http\Controllers\AdminController::class, 'getProductVariationByProduct']);
+Route::get('/getcategory', [App\Http\Controllers\AdminController::class, 'getCategory']);
+Route::get('/getsubcategory', [App\Http\Controllers\AdminController::class, 'getSubCategory']);
+Route::get('/getproduct', [App\Http\Controllers\AdminController::class, 'getProduct']);
+Route::get('/getproductvariationdiscount', [App\Http\Controllers\AdminController::class, 'getProductVariationDiscount']);
+Route::delete('/deletediscountbyproductvariation', [App\Http\Controllers\AdminController::class, 'deleteDiscountByProductVariation']);
