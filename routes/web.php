@@ -14,9 +14,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/login', function () {
+Route::get('/admin', function () {
     return view('sign-in');
 });
 
-Route::post('/register',[App\Http\Controllers\AdminController::class,'register']);
+
 Route::post('/login',[App\Http\Controllers\AdminController::class,'login']);
+Route::get('/product-management.html',[App\Http\Controllers\AdminController::class,'showProductManagement']);
+Route::get('/invoice-management.html',[App\Http\Controllers\AdminController::class,'showInvoice']);
+Route::get('/invoice', [App\Http\Controllers\AdminController::class, 'Invoice']);
+Route::get('/export-pdf', [App\Http\Controllers\AdminController::class, 'exportPdf']);
+
+Route::get('/statistics.html', [App\Http\Controllers\AdminController::class, 'Statistics']);
+Route::post('/statistics/revenue', [App\Http\Controllers\AdminController::class, 'getRevenueData'])->name('statistics.revenue');
+
+Route::get('/promotion-management.html', [App\Http\Controllers\AdminController::class, 'showPromotion']);
+

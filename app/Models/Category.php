@@ -17,4 +17,17 @@ class Category extends Model
         'createdAt',
         'updatedAt'
     ];
+
+    public function subCategories()
+    {
+        return $this->hasMany(SupCategory::class, 'categoryId');
+    }
+
+    // To get products through SupCategory
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'categoryId');
+    }
+
+   
 }

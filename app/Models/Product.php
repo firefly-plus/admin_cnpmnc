@@ -19,6 +19,18 @@ class Product extends Model
         'createdAt',
         'updatedAt'
     ];
+    public function invoices()
+    {
+        return $this->belongsToMany(Invoice::class, 'invoicedetail', 'ID_productVariation', 'ID_Invoice');
+    }
+    
+    
+
+    public function invoiceDetails()
+{
+    return $this->hasMany(InvoiceDetail::class, 'ID_productVariation');
+}
+
 
     // Khai báo mối quan hệ với bảng 'supcategory'
     public function subCategory()
