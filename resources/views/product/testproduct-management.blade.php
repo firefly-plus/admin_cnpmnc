@@ -205,7 +205,8 @@
 
         .btn__save-variant,
         .btn__edit-variant,
-        .btn__add-variant {
+        .btn__add-variant,
+        .btn__update-product {
             margin-top: 20px;
             border-radius: 10px;
             padding: 5px 10px;
@@ -227,7 +228,7 @@
             cursor: not-allowed;
         }
 
-        .btn__add-variant {
+        .btn__add-variant, .btn__update-product {
             margin-left: 20px;
             background-color: rgb(0, 197, 36);
             border: 1px solid rgb(0, 197, 36);
@@ -409,7 +410,7 @@
 
                             <!-- Modal footer -->
                             <div class="modal-footer">
-                                <button class="btn__add-variant">Cập nhật</button>
+                                <button class="btn__update-product">Cập nhật</button>
                                 <button type="button" class="btn btn-danger btn__close-modal"
                                     data-bs-dismiss="modal">Đóng</button>
                             </div>
