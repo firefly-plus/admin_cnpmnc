@@ -20,10 +20,18 @@ class InvoiceDetail extends Model
     ];
 
     // Khai báo mối quan hệ với bảng 'invoice'
+   
     public function invoice()
     {
         return $this->belongsTo(Invoice::class, 'ID_Invoice');
     }
+    
+    public function product()
+{
+    return $this->belongsTo(Product::class, 'ID_productVariation');
+}
+
+    
 
     // Khai báo mối quan hệ với bảng 'productvariation'
     public function productVariation()

@@ -2,55 +2,305 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\employees;
+use App\Models\Employee;
+use App\Models\Invoice;
+use App\Models\InvoiceDetail;
+use App\Models\Product;
+use App\Models\ProductVariation;
+use App\Models\SupCategory;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
     //
-    public function register(Request $request)
+    public function showLogin()
     {
-        
-        $request->validate([
-            'FullName' => 'required|string|max:255',
-            'Phone' => 'required|string|max:15|unique:employees',
-            'Password' => 'required|string|min:1',  
-        ]);
-
-       
-        $hashedPassword = Hash::make($request->Password);
-
-      
-        $employee = employees::create([
-            'FullName' => $request->FullName,
-            'Phone' => $request->Phone,
-            'Passwords' => $hashedPassword,  
-            'address' => $request->address ?? null,
-            'isDelete' => false,  
-        ]);
-
-        return response()->json([
-            'message' => 'Đăng ký thành công!',
-            'employee' => $employee,
-        ], 201);  
+        return view('sign-in');
     }
+
+    public function showProductManagement() 
+    {
+        return view('product.product-management');
+    }
+        
 
     public function login(Request $request)
     {
         $request->validate([
-            'Phone' => 'required|string|max:15',
+            'Phone' => 'required|digits:10',
             'Password' => 'required|string|min:1',
         ]);
-        $employee = employees::where('Phone', $request->Phone)->first();
+        $employee = Employee::where('Phone', $request->Phone)->first();
 
+        if ($request->has('rememberMe') && $request->rememberMe == 'on') {
+            Cookie::queue('employee_id', $employee->id, 60 * 24 * 30); 
+            Cookie::queue('employee_name', $employee->FullName, 60 * 24 * 30);
+        }
         if ($employee && Hash::check($request->Password, $employee->Passwords)) 
         {
             session(['employee_id' => $employee->id]); 
             session(['employee_name' => $employee->FullName]); 
-            return redirect()->url('/login');
+            return redirect()->to('/statistics.html');
         } else {
-            return back()->withErrors(['message' => 'Thông tin đăng nhập không chính xác.']);  
+            return back()->withErrors(['error' => 'Thông tin đăng nhập không chính xác.']);  
         }
     }
+
+    public function showInvoice() 
+    {
+        return view('invoice.invoice-management');
+    }
+
+    public function Invoice(Request $request)
+    {
+       
+        $invoices = Invoice::getAllInvoices($request);
+        return response()->json($invoices);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        try {
+            $selectedInvoices = $request->input('invoices'); // Lấy danh sách hóa đơn đã chọn từ request
+    
+            // Convert to array if it is a string (in case it's a single invoice ID)
+            if (is_string($selectedInvoices)) {
+                $selectedInvoices = explode(',', $selectedInvoices);
+            }
+        
+            if (empty($selectedInvoices)) {
+                return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một hóa đơn!');
+            }
+        
+            // Lấy hóa đơn từ cơ sở dữ liệu
+            $invoices = Invoice::with('invoiceDetails.productVariation.product')
+                                ->whereIn('id', $selectedInvoices)
+                                ->get();
+            
+            Log::debug('Retrieved invoices: ', $invoices->toArray());
+            
+            // Tạo file PDF và lưu vào thư mục public/pdf
+            $pdfPath = public_path('pdf/hoadon.pdf');
+            $pdf = Pdf::loadView('invoice.pdf', compact('invoices'));
+            $pdf->save($pdfPath);
+        
+            // Trả về URL của file PDF để client tải về
+            return response()->json(['pdfPath' => asset('pdf/hoadon.pdf')], 200);
+        } catch (\Exception $e) {
+            Log::error('Lỗi xuất PDF: ' . $e->getMessage());
+            return response()->json(['error' => 'Có lỗi xảy ra khi xuất PDF'], 500);
+        }
+    }
+
+    public function Statistics(Request $request)
+    {
+        $now = Carbon::now('Asia/Ho_Chi_Minh')->endOfDay();
+        Log::info('Current DateTime (endOfDay): ', ['now' => $now]);
+
+        $year = Carbon::now('Asia/Ho_Chi_Minh')->subDays(365)->startOfYear()->toDateString();
+        Log::info('Start of Year (365 days ago): ', ['year' => $year]);
+
+        $start_of_month = Carbon::now('Asia/Ho_Chi_Minh')->startOfMonth();
+        Log::info('Start of Current Month: ', ['start_of_month' => $start_of_month]);
+
+        $total_year = Invoice::whereBetween('createdAt', [$year, $now])
+            ->where('orderStatus', "Completed")
+            ->get();
+        Log::info('Total invoices in the last year: ', ['total_year' => $total_year->count()]);
+
+        $invoicesDay = Invoice::whereDate('createdAt', Carbon::today())
+            ->where('orderStatus', "Completed")
+            ->get();
+        Log::info('Invoices for today: ', ['invoicesDay' => $invoicesDay->count()]);
+
+        $userCount = User::count();
+        Log::info('Total users count: ', ['userCount' => $userCount]);
+
+        Log::info('Danh sách người dùng:', ['users' => User::all()]);
+
+        $movies = Product::all();
+        Log::info('Total products count: ', ['movies' => $movies->count()]);
+
+        // Tính tổng doanh thu hôm nay
+        $sum_today = 0;
+        foreach ($invoicesDay as $invoice) {
+            $sum_today += $invoice->totalAmount;
+        }
+        Log::info('Total revenue for today: ', ['sum_today' => $sum_today]);
+
+        $sum = 0;
+        foreach ($total_year as $invoice) {
+            $sum += $invoice->totalAmount;
+        }
+        Log::info('Total revenue for the last year: ', ['sum' => $sum]);
+
+        $sum_iv_today = 0;
+        foreach ($invoicesDay as $invoice) {
+            
+                $sum_iv_today += 1;
+            
+        }
+        Log::info('Total ticket seats sold today: ', ['sum_iv_today' => $sum_iv_today]);
+
+        // Doanh thu theo danh mục
+        $revenueByCategory = [];
+        $subCates = SupCategory::all();
+        $proDucts = Product::all();
+        $proDuct_Vas = ProductVariation::all();
+        $Invoices_Des = InvoiceDetail::all();
+        foreach ($subCates as $subCate) {
+            $sumByCate = 0;
+
+            Log::info('Processing subcategory: ', ['subCate' => $subCate->SupCategoryName]);
+
+            foreach ($proDucts as $proDuct) {
+                if ($subCate->id == $proDuct->ID_SupCategory) {
+                    foreach ($proDuct_Vas as $proDuct_Va) {
+                        if ($proDuct->id == $proDuct_Va->ID_Product) {
+                            foreach ($Invoices_Des as $Invoices_De) {
+                            //    dd($Invoices_De->toArray());
+
+                                if ($proDuct_Va->id == $Invoices_De->ID_productVariation) {
+                                    Log::info('Invoice Detail:', ['product_variation_id' => $proDuct_Va->id, 'amount' => $Invoices_De->Amount]);
+                                    
+                                    if ($Invoices_De->invoice->orderStatus == 'Completed') {
+                                        
+                                        $sumByCate += $Invoices_De->Amount;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            $revenueByCategory[] = [
+                'category' => $subCate->SupCategoryName,
+                'revenue' => $sumByCate,
+            ];
+        
+
+            Log::info('Total revenue for subcategory: ', ['sumByCate' => $sumByCate]);
+        }
+        
+        $revenueByProduct = [];
+
+        foreach ($proDuct_Vas as $product) {
+            $sumByPro = 0;
+            
+            Log::info('Processing product variation:', ['product' => $product->productName]);
+        
+            foreach($Invoices_Des as $Invoices_De) {
+                // Check the relationship and field values
+                Log::info('Checking invoice detail:', [
+                    'product_variation_id' => $product->id,
+                    'invoice_detail_product_variation_id' => $Invoices_De->ID_productVariation,
+                    'invoice_status' => $Invoices_De->invoice->orderStatus,
+                ]);
+        
+                if($product->id == $Invoices_De->ID_productVariation) {
+                    if ($Invoices_De->invoice->orderStatus == 'Completed') {
+                        $sumByPro += $Invoices_De->Amount;
+                    }
+                }
+            }
+        
+            $revenueByProduct[] = [
+                'product' => $product->product->productName.' Size: '.$product->size, 
+                'revenue' => $sumByPro,  
+            ];
+        
+            Log::info('Revenue for product:', ['product' => $product->productName, 'revenue' => $sumByPro]);
+        }
+        $revenueByCategory = collect($revenueByCategory); // Chuyển thành Collection
+        $revenueByProduct = collect($revenueByProduct);   // Chuyển thành Collection
+        return view('statistics.index', compact(
+            'userCount',
+            'sum_today',
+            'sum',
+            'sum_iv_today',
+            'now',
+            'year',
+            'revenueByCategory', // Changed this variable name to match the view
+            'revenueByProduct' // Added the revenueByProduct to the view
+        ));
+    }
+
+
+    
+
+    public function getRevenueData(Request $request)
+    {
+        $statistical = $request->statistical;
+        
+        $start_time = $request->start_time ? Carbon::parse($request->start_time) : Carbon::now();
+        $end_time = $request->end_time ? Carbon::parse($request->end_time) : Carbon::now();
+    
+        if ($statistical == 'week') {
+            $start_time = Carbon::now()->startOfWeek(); 
+            $end_time = Carbon::now()->endOfWeek(); 
+        } elseif ($statistical == 'last_week') {
+           
+            $start_time = Carbon::now()->subWeek()->startOfWeek();
+            $end_time = Carbon::now()->subWeek()->endOfWeek();
+        } elseif ($statistical == 'this_month') {
+            // Lọc theo tháng này
+            $start_time = Carbon::now()->startOfMonth();
+            $end_time = Carbon::now()->endOfMonth();
+        } elseif ($statistical == 'last_month') {
+          
+            $start_time = Carbon::now()->subMonth()->startOfMonth();
+            $end_time = Carbon::now()->subMonth()->endOfMonth();
+        } elseif ($statistical == 'year') {
+            
+            $start_time = Carbon::now()->startOfYear();
+            $end_time = Carbon::now()->endOfYear();
+        } elseif ($statistical == 'last_year') {
+           
+            $start_time = Carbon::now()->subYear()->startOfYear();
+            $end_time = Carbon::now()->subYear()->endOfYear();
+        } elseif ($statistical == 'all_time') {
+           
+            $start_time = Carbon::createFromDate(2000, 1, 1); 
+            $end_time = Carbon::now(); 
+        }
+    
+      
+        $revenue_per_day = Invoice::whereBetween('createdAt', [$start_time, $end_time])
+                                  ->where('orderStatus', 'Completed')
+                                  ->selectRaw('DATE(createdAt) as date, SUM(totalAmount) as revenue')
+                                  ->groupBy('date')
+                                  ->orderBy('date')
+                                  ->get();
+    
+       
+        $labels = $revenue_per_day->pluck('date');
+        $revenues = $revenue_per_day->pluck('revenue');
+        
+      
+        return response()->json([
+            'labels' => $labels,
+            'revenues' => $revenues,
+        ]);
+    }
+    
+    
+    //Promotion
+    public function showPromotion()
+    {
+        return view('promotion.management-promotion');
+    }
+
+
+    
+
+    
+ 
+    
 }

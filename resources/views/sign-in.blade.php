@@ -44,15 +44,49 @@
                   <p class="mb-0">Enter your email and password to sign in</p>
                 </div>
                 <div class=" card-body">
-                  <form action="admin/sign_in" method="POST" role="form">
+                  <form action="/login" method="POST" role="form" autocomplete="off">
                     @csrf
 
+                
                     <div class="mb-3">
-                      <input type="email" name="email" class="form-control form-control-lg" placeholder="Email" aria-label="Email">
-                    </div>
-                    <div class="mb-3">
-                      <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
-                    </div>
+                 
+                        <input type="tel" id="phone" name="Phone" class="form-control form-control-lg" placeholder="Số điện thoại" aria-label="Số điện thoại" pattern="\d{10}" title="Vui lòng nhập số điện thoại gồm 10 chữ số" required autocomplete="off">
+                        <small id="phoneError" class="form-text text-danger" style="display:none;">Vui lòng nhập số điện thoại hợp lệ (10 chữ số).</small>
+                      </div>
+                      <div class="mb-3">
+                        <input type="password" name="Password" class="form-control form-control-lg" placeholder="Mật khẩu" aria-label="Mật khẩu" required>
+                      </div>
+                      
+                      {{-- <script>
+                        const phoneInput = document.getElementById('phone');
+                        const phoneError = document.getElementById('phoneError');
+                        
+                        phoneInput.addEventListener('input', function () {
+                          const phoneValue = phoneInput.value;
+                          
+                        
+                          const isValidPhone = /^\d{10}$/.test(phoneValue);
+                          
+                          if (!isValidPhone) {
+                            phoneError.style.display = 'block';
+                          } else {
+                            phoneError.style.display = 'none';
+                          }
+                        });
+                      </script> --}}
+                      <script>
+                        document.querySelector('form').addEventListener('submit', function (event) {
+                          if (document.getElementById('rememberMe').checked) {
+                           
+                            document.cookie = "rememberMe=true; path=/; max-age=" + (60 * 60 * 24 * 30); // Cookie sẽ hết hạn sau 30 ngày
+                          } else {
+                            document.cookie = "rememberMe=false; path=/; max-age=0"; // Xóa cookie nếu không chọn "Remember me"
+                          }
+                        });
+                      </script>
+                      
+                      
+                      
                     <div class="form-check form-switch">
                       <input class="form-check-input" type="checkbox" id="rememberMe">
                       <label class="form-check-label" for="rememberMe">Remember me</label>
