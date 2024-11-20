@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
@@ -309,7 +310,7 @@ class AdminController extends Controller
                 $query->where('id', $request->id);
             })
             ->get();
-        $discounts = Discount::all();
+        $discounts = VariationDiscount::all();
     
         $filteredProductVariations = [];
         foreach ($productVariations as $productVariation) {
@@ -335,7 +336,7 @@ class AdminController extends Controller
                 $query->where('id', $request->id);
             })
             ->get();
-        $discounts = Discount::all();
+        $discounts = VariationDiscount::all();
         $filteredProductVariations = [];
         foreach ($productVariations as $productVariation) {
             $hasDiscount = false;
@@ -359,7 +360,7 @@ class AdminController extends Controller
             ->where('ID_Product', $request->id)
             ->get();
     
-        $discounts = Discount::all();
+        $discounts = VariationDiscount::all();
         $filteredProductVariations = [];
         foreach ($productVariations as $productVariation) {
             $hasDiscount = false;
@@ -422,6 +423,35 @@ class AdminController extends Controller
         $variationDiscount->delete();
         return response()->json(['message' => 'Khuyến mãi đã được hủy thành công.'], 200);
     }
+
+    public function addVariationDiscount(Request $request)
+    {
+        $request->validate([
+            'ID_Variation'=>'required|array',
+        ]);
+
+        try{
+            foreach($request->ID_Variation as $id)
+            {
+                VariationDiscount::create([
+                    'ID_Variation' => $id,
+                    'ID_Discount' => $request->input('ID_Discount'),
+                    'StartDate' => $request->input('StartDate'),
+                    'EndDate' => $request->input('EndDate'),
+                    'status' =>1,
+                ]);
+            }
+
+        }catch(Exception $e)
+        {
+            return response()->json([
+                'success'=>false,
+                'message' => $e->getMessage(),
+            ],422);
+        }
+    }
+
+    
 
 
 

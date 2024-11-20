@@ -208,8 +208,8 @@ select.form-control {
 
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    
+
+<script> 
     $(document).ready(function() {
         $.ajax({
             url: '/getdiscount',
@@ -290,135 +290,15 @@ select.form-control {
             }
         });
     });
-
 </script>
-<script>
-    $(document).ready(function() {
-        $('#category').on('change', function() {
-            var categoryId = $(this).val();
 
-            if (categoryId) {
-                $.ajax({
-                    url: '/getproductvariationbycategory', 
-                    type: 'GET',
-                    data: { id: categoryId },
-                    dataType: 'json',
-                    success: function(data) {
-                        $('.product-grid').empty();
-
-                        $.each(data, function(index, variation) {
-                            
-                            var imageUrl = variation.product.product_images && variation.product.product_images.length > 0
-                                ? variation.product.product_images[0].IMG_URL 
-                                : '/images/team.jpg';
-
-                            var productHtml = '<div class="product-card">' +
-                                '<input type="checkbox" class="product-checkbox" data-product-id="' + variation.product.id + '">' +
-                                '<div style="clear: both"></div>' +
-                                '<p><img style="width: 150px;" src="' + imageUrl + '" alt="Product Image"></p>' +
-                                '<p><strong>Product Name:</strong> ' + variation.product.productName + '</p>' +
-                                '<p><strong>Price:</strong> ' + variation.Price + '</p>' +
-                                '</div>';
-
-                            $('.product-grid').append(productHtml);
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching product variations:', error);
-                    }
-                });
-            } else {
-                $('.product-grid').empty();
-            }
-        });
-    });
-    $(document).ready(function() {
-        $('#subcategory').on('change', function() {
-            var categoryId = $(this).val();
-
-            if (categoryId) {
-                $.ajax({
-                    url: '/getproductvariationbysubcategory', 
-                    type: 'GET',
-                    data: { id: categoryId },
-                    dataType: 'json',
-                    success: function(data) {
-                        $('.product-grid').empty();
-
-                        $.each(data, function(index, variation) {
-                            
-                            var imageUrl = variation.product.product_images && variation.product.product_images.length > 0
-                                ? variation.product.product_images[0].IMG_URL 
-                                : '/images/team.jpg';
-
-                            var productHtml = '<div class="product-card">' +
-                                '<input type="checkbox" class="product-checkbox" data-product-id="' + variation.product.id + '">' +
-                                '<div style="clear: both"></div>' +
-                                '<p><img style="width: 150px;" src="' + imageUrl + '" alt="Product Image"></p>' +
-                                '<p><strong>Product Name:</strong> ' + variation.product.productName + '</p>' +
-                                '<p><strong>Price:</strong> ' + variation.Price + '</p>' +
-                                '</div>';
-
-                            $('.product-grid').append(productHtml);
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching product variations:', error);
-                    }
-                });
-            } else {
-                $('.product-grid').empty();
-            }
-        });
-    });
-    $(document).ready(function() {
-        $('#product').on('change', function() {
-            var categoryId = $(this).val();
-
-            if (categoryId) {
-                $.ajax({
-                    url: '/getproductvariationbyproduct', 
-                    type: 'GET',
-                    data: { id: categoryId },
-                    dataType: 'json',
-                    success: function(data) {
-                        $('.product-grid').empty();
-
-                        $.each(data, function(index, variation) {
-                            
-                            var imageUrl = variation.product.product_images && variation.product.product_images.length > 0
-                                ? variation.product.product_images[0].IMG_URL 
-                                : '/images/team.jpg';
-
-                            var productHtml = '<div class="product-card">' +
-                                '<input type="checkbox" class="product-checkbox" data-product-id="' + variation.product.id + '">' +
-                                '<div style="clear: both"></div>' +
-                                '<p><img style="width: 150px;" src="' + imageUrl + '" alt="Product Image"></p>' +
-                                '<p><strong>Product Name:</strong> ' + variation.product.productName + '</p>' +
-                                '<p><strong>Price:</strong> ' + variation.Price + '</p>' +
-                                '</div>';
-
-                            $('.product-grid').append(productHtml);
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching product variations:', error);
-                    }
-                });
-            } else {
-                $('.product-grid').empty();
-            }
-        });
-    });
-</script>
 {{-- check all cho ds chưa discount --}}
 <script>
-     $(document).ready(function() {
+    $(document).ready(function() {
         var selectedProducts = []; 
-
+        //này check all
         $('#check-all').on('change', function() {
             var isChecked = $(this).prop('checked'); 
-
             $('.product-checkbox').prop('checked', isChecked);
 
             if (isChecked) {
@@ -428,45 +308,240 @@ select.form-control {
             } else {
                 selectedProducts = [];
             }
-
             console.log('Selected Products:', selectedProducts); 
         });
-
-        // Lắng nghe sự kiện thay đổi của checkbox sản phẩm
+        //này xóa check hoặc thêm
         $(document).on('change', '.product-checkbox', function() {
             var productId = $(this).data('product-id'); 
             var isChecked = $(this).prop('checked'); 
 
             if (isChecked) {
-                
                 if (!selectedProducts.includes(productId)) {
                     selectedProducts.push(productId);
                 }
             } else {
-               
                 var index = selectedProducts.indexOf(productId);
                 if (index > -1) {
                     selectedProducts.splice(index, 1);
                 }
             }
-
             console.log('Selected Products:', selectedProducts); 
         });
+        //3 thàng sau này là lọc biến thể
+        $(document).ready(function() {
+            $('#category').on('change', function() {
+                var categoryId = $(this).val();
+                selectedProducts = []; 
+                if (categoryId) {
+                    $.ajax({
+                        url: '/getproductvariationbycategory', 
+                        type: 'GET',
+                        data: { id: categoryId },
+                        dataType: 'json',
+                        success: function(data) {
+                            $('.product-grid').empty();
+
+                            $.each(data, function(index, variation) {
+                                
+                                var imageUrl = variation.product.product_images && variation.product.product_images.length > 0
+                                    ? variation.product.product_images[0].IMG_URL 
+                                    : '/images/team.jpg';
+
+                                var productHtml = '<div class="product-card">' +
+                                    '<input type="checkbox" class="product-checkbox" data-product-id="' + variation.id + '">' +
+                                    '<div style="clear: both"></div>' +
+                                    '<p><img style="width: 150px;" src="' + imageUrl + '" alt="Product Image"></p>' +
+                                    '<p><strong>Product Name:</strong> ' + variation.product.productName + '</p>' +
+                                    '<p><strong>Price:</strong> ' + variation.Price + '</p>' +
+                                    '</div>';
+
+                                $('.product-grid').append(productHtml);
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching product variations:', error);
+                        }
+                    });
+                } else {
+                    $('.product-grid').empty();
+                }
+            });
+        });
+        $(document).ready(function() {
+            $('#subcategory').on('change', function() {
+                var categoryId = $(this).val();
+                selectedProducts = []; 
+                if (categoryId) {
+                    $.ajax({
+                        url: '/getproductvariationbysubcategory', 
+                        type: 'GET',
+                        data: { id: categoryId },
+                        dataType: 'json',
+                        success: function(data) {
+                            $('.product-grid').empty();
+
+                            $.each(data, function(index, variation) {
+                                
+                                var imageUrl = variation.product.product_images && variation.product.product_images.length > 0
+                                    ? variation.product.product_images[0].IMG_URL 
+                                    : '/images/team.jpg';
+
+                                var productHtml = '<div class="product-card">' +
+                                    '<input type="checkbox" class="product-checkbox" data-product-id="' + variation.id + '">' +
+                                    '<div style="clear: both"></div>' +
+                                    '<p><img style="width: 150px;" src="' + imageUrl + '" alt="Product Image"></p>' +
+                                    '<p><strong>Product Name:</strong> ' + variation.product.productName + '</p>' +
+                                    '<p><strong>Price:</strong> ' + variation.Price + '</p>' +
+                                    '</div>';
+
+                                $('.product-grid').append(productHtml);
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching product variations:', error);
+                        }
+                    });
+                } else {
+                    $('.product-grid').empty();
+                }
+            });
+        });
+        $(document).ready(function() {
+            $('#product').on('change', function() {
+                var categoryId = $(this).val();
+                selectedProducts = []; 
+                if (categoryId) {
+                    $.ajax({
+                        url: '/getproductvariationbyproduct', 
+                        type: 'GET',
+                        data: { id: categoryId },
+                        dataType: 'json',
+                        success: function(data) {
+                            $('.product-grid').empty();
+
+                            $.each(data, function(index, variation) {
+                                
+                                var imageUrl = variation.product.product_images && variation.product.product_images.length > 0
+                                    ? variation.product.product_images[0].IMG_URL 
+                                    : '/images/team.jpg';
+
+                                var productHtml = '<div class="product-card">' +
+                                    '<input type="checkbox" class="product-checkbox" data-product-id="' + variation.id + '">' +
+                                    '<div style="clear: both"></div>' +
+                                    '<p><img style="width: 150px;" src="' + imageUrl + '" alt="Product Image"></p>' +
+                                    '<p><strong>Product Name:</strong> ' + variation.product.productName + '</p>' +
+                                    '<p><strong>Price:</strong> ' + variation.Price + '</p>' +
+                                    '</div>';
+
+                                $('.product-grid').append(productHtml);
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching product variations:', error);
+                        }
+                    });
+                } else {
+                    $('.product-grid').empty();
+                }
+            });
+        });
+        //này apply giảm giá
+        $('#apply-discount').on('click', function () {
+            var discountId = $('#discount').val();
+            var startDate = $('#start_date').val();
+            var endDate = $('#end_date').val();
+            console.log(discountId);
+            console.log(startDate);
+            console.log(endDate);
+            // Kiểm tra nếu ngày bắt đầu và ngày kết thúc hợp lệ
+            if (!discountId || !startDate || !endDate) {
+                alert('Vui lòng chọn đầy đủ thông tin giảm giá, ngày bắt đầu và ngày kết thúc!');
+                return;  // Dừng việc gửi yêu cầu nếu thiếu thông tin
+            }
+
+            // Kiểm tra ngày bắt đầu phải nhỏ hơn ngày kết thúc
+            if (new Date(startDate) >= new Date(endDate)) {
+                alert('Ngày bắt đầu phải nhỏ hơn ngày kết thúc!');
+                return;  // Dừng nếu ngày không hợp lệ
+            }
+
+            // Gửi AJAX nếu tất cả các trường đã được điền đầy đủ và hợp lệ
+            $.ajax({
+                url: '/addvariationdiscount',
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                },
+                data: {
+                    ID_Variation: selectedProducts,
+                    ID_Discount: discountId,
+                    StartDate: startDate,
+                    EndDate: endDate,
+                },
+                success: function(response) {
+                    alert(response.message || 'Thêm giảm giá thành công!');
+                    selectedProducts.forEach(function (productId) {
+                        $('.product-checkbox[data-product-id="' + productId + '"]').closest('.product-card').remove();
+                    });
+                    loadProducts();
+                    selectedProducts = [];
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', xhr.responseJSON);
+                    if (xhr.responseJSON.errors) {
+                        alert('Lỗi: ' + JSON.stringify(xhr.responseJSON.errors));
+                    } else {
+                        alert('Có lỗi xảy ra, vui lòng thử lại!');
+                    }
+                },
+            });
+        });
+        
+
     });
+
+    function loadProducts() {
+        $.ajax({
+            url: '/getproductvariationdiscount', 
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                if (!Array.isArray(data)) {
+                    console.error('Invalid data format:', data);
+                    return;
+                }
+                $('#product-list-discount').empty();
+                data.forEach(function(product) {
+                    var row = `
+                        <tr id="product-${product.id}">
+                            <td>${product.product.productName}</td>
+                            <td>${product.size}</td>
+                            <td>${product.Price}</td>
+                            <td>${product.variationdiscount?.[0]?.discount?.discount || 'N/A'}</td>
+                            <td><img src="${product.product?.product_images?.[0]?.IMG_URL || 'placeholder.jpg'}" alt="${product.product.productName}" width="100"></td>
+                            <td><button class="btn btn-success delete-discount" data-product-id="${product.id}">Accept</button></td>
+                        </tr>
+                    `;
+                    $('#product-list-discount').append(row);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading products:', error);
+            }
+        });
+    }
 </script>
-{{-- check all cho ds đã discount --}}
+
 <script>
     $(document).ready(function() {
         function loadProducts() {
             $.ajax({
-                url: '/getproductvariationdiscount',  // Địa chỉ API để lấy dữ liệu sản phẩm
+                url: '/getproductvariationdiscount', 
                 type: 'GET',
                 dataType: 'json',
                 success: function(data) {
-                    // Xóa nội dung bảng trước khi thêm dữ liệu mới
+                  
                     $('#product-list-discount').empty();
-
-                    // Duyệt qua từng sản phẩm trong mảng dữ liệu
                     data.forEach(function(product) {
                         var row = `
                            <tr id="product-${product.id}">
@@ -480,7 +555,6 @@ select.form-control {
 
 
                         `;
-                        // Thêm dòng vào bảng
                         $('#product-list-discount').append(row);
                     });
                 },
@@ -489,36 +563,28 @@ select.form-control {
                 }
             });
         }
-
-        // Gọi hàm để tải sản phẩm ngay khi trang được tải
         loadProducts();
     });
-
     $(document).ready(function () {
-    $(document).on('click', '.delete-discount', function () {
-        var productId = $(this).data('product-id'); 
-        console.log("Product ID: ", productId); // Kiểm tra xem ID có được log ra hay không
+        $(document).on('click', '.delete-discount', function () {
+            var productId = $(this).data('product-id'); 
+            console.log("Product ID: ", productId); // Kiểm tra xem ID có được log ra hay không
 
-        $.ajax({
-            url: '/deletediscountbyproductvariation?id=' + productId, 
-            method: 'DELETE', 
-            dataType: 'json',
-            success: function (response) {
-                if (response.message === 'Khuyến mãi đã được hủy thành công.') {
-                    $('#product-' + productId).remove();
-                    alert('Khuyến mãi đã được hủy thành công!');
+            $.ajax({
+                url: '/deletediscountbyproductvariation?id=' + productId, 
+                method: 'DELETE', 
+                dataType: 'json',
+                success: function (response) {
+                    if (response.message === 'Khuyến mãi đã được hủy thành công.') {
+                        $('#product-' + productId).remove();
+                        alert('Khuyến mãi đã được hủy thành công!');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('Đã có lỗi xảy ra khi hủy khuyến mãi. Vui lòng thử lại!');
                 }
-            },
-            error: function (xhr, status, error) {
-                alert('Đã có lỗi xảy ra khi hủy khuyến mãi. Vui lòng thử lại!');
-            }
+            });
         });
     });
-});
-
-
-
 </script>
-
-
 @endsection

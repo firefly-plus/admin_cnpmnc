@@ -39,3 +39,4 @@ Route::get('/getsubcategory', [App\Http\Controllers\AdminController::class, 'get
 Route::get('/getproduct', [App\Http\Controllers\AdminController::class, 'getProduct']);
 Route::get('/getproductvariationdiscount', [App\Http\Controllers\AdminController::class, 'getProductVariationDiscount']);
 Route::delete('/deletediscountbyproductvariation', [App\Http\Controllers\AdminController::class, 'deleteDiscountByProductVariation']);
+Route::post('/addvariationdiscount', [App\Http\Controllers\AdminController::class, 'addVariationDiscount']);
