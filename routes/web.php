@@ -18,5 +18,10 @@ Route::get('/login', function () {
     return view('sign-in');
 });
 
+include 'admin.php';
+Route::get('/user', function () {
+    return view('user-management');
+});
+
 Route::post('/register',[App\Http\Controllers\AdminController::class,'register']);
 Route::post('/login',[App\Http\Controllers\AdminController::class,'login']);
