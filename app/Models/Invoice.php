@@ -42,9 +42,9 @@ class Invoice extends Model
     }
 
     public function invoiceDetails()
-{
-    return $this->hasMany(InvoiceDetail::class, 'ID_Invoice');
-}
+    {
+        return $this->hasMany(InvoiceDetail::class, 'ID_Invoice');
+    }
 
 
 

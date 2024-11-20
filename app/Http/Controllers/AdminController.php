@@ -451,6 +451,30 @@ class AdminController extends Controller
         }
     }
 
+    // user management
+    public function showUser()
+    {
+        return view('user.user-management');
+    }
+
+    public function getUser()
+    {
+        $users=User::all();
+        return response()->json($users);
+    }
+
+    public function getUserById(Request $request)
+    {
+        $user = User::find($request->id);       
+        return response()->json($user);     
+    }
+
+    public function getInvoiceByUser(Request $request)
+    {
+        $invoices=Invoice::where('ID_User',$request->id)->get();
+        return response()->json($invoices);
+    }
+
     
 
 

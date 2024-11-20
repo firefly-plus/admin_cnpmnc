@@ -40,3 +40,8 @@ Route::get('/getproduct', [App\Http\Controllers\AdminController::class, 'getProd
 Route::get('/getproductvariationdiscount', [App\Http\Controllers\AdminController::class, 'getProductVariationDiscount']);
 Route::delete('/deletediscountbyproductvariation', [App\Http\Controllers\AdminController::class, 'deleteDiscountByProductVariation']);
 Route::post('/addvariationdiscount', [App\Http\Controllers\AdminController::class, 'addVariationDiscount']);
+
+Route::get('/user-management.html', [App\Http\Controllers\AdminController::class, 'showUser']);
+Route::get('/getuser', [App\Http\Controllers\AdminController::class, 'getUser']);
+Route::get('/getuserbyid', [App\Http\Controllers\AdminController::class, 'getUserById']);
+Route::get('/getinvoicebyuser', [App\Http\Controllers\AdminController::class, 'getInvoiceByUser']);
