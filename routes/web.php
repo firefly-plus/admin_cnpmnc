@@ -22,6 +22,7 @@ Route::get('/admin', function () {
 
 Route::post('/login',[App\Http\Controllers\AdminController::class,'login']);
 Route::get('/product-management.html',[App\Http\Controllers\AdminController::class,'showProductManagement']);
+
 Route::get('/invoice-management.html',[App\Http\Controllers\AdminController::class,'showInvoice']);
 Route::get('/invoice', [App\Http\Controllers\AdminController::class, 'Invoice']);
 Route::get('/export-pdf', [App\Http\Controllers\AdminController::class, 'exportPdf']);
@@ -45,3 +46,8 @@ Route::get('/user-management.html', [App\Http\Controllers\AdminController::class
 Route::get('/getuser', [App\Http\Controllers\AdminController::class, 'getUser']);
 Route::get('/getuserbyid', [App\Http\Controllers\AdminController::class, 'getUserById']);
 Route::get('/getinvoicebyuser', [App\Http\Controllers\AdminController::class, 'getInvoiceByUser']);
+Route::post('/updatestatususer', [App\Http\Controllers\AdminController::class, 'updateStatusUser']);
+Route::post('/getuserbystatus', [App\Http\Controllers\AdminController::class, 'getUserByStatus']);
+
+Route::get('/getvoucher', [App\Http\Controllers\AdminController::class, 'getVoucher']);
+Route::get('/voucher-management.html', [App\Http\Controllers\AdminController::class, 'showVoucher']);

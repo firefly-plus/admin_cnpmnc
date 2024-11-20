@@ -12,6 +12,7 @@ use App\Models\ProductVariation;
 use App\Models\SupCategory;
 use App\Models\User;
 use App\Models\VariationDiscount;
+use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
@@ -474,6 +475,37 @@ class AdminController extends Controller
         $invoices=Invoice::where('ID_User',$request->id)->get();
         return response()->json($invoices);
     }
+
+    public function updateStatusUser(Request $request)
+    {
+        $user = User::find($request->id);
+        $user->isDelete = $user->isDelete == 0 ? 1 : 0;
+        $user->save();
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật trạng thái thành công.',
+            'newStatus' => $user->isDelete
+        ]);
+    }
+
+    public function getUserByStatus(Request $request)
+    {
+        $user=User::where('isDelete',$request->isDelete)->get();
+        return response()->json($user);
+    }
+
+    //voucher
+    public function showVoucher()
+    {
+        return view('voucher.voucher-management');
+    }
+    
+    public function getVoucher()
+    {
+        $vouchers=Voucher::all();
+        return response()->json($vouchers);
+    }
+
 
     
 

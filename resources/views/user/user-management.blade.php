@@ -251,13 +251,13 @@
                 {{-- Chỗ này để lọc user --}}
                 <div class="row row-filter">
                     <div class="filter-user">
-                        <label for="user-filter">Tên:</label>
-                        <select id="user-filter" class="dropdown">
+                        <label for="user-filter" id="quantity">Quantity:</label>
+                        {{-- <select id="user-filter" class="dropdown">
                             <option value="">Tất cả</option>
                             <option value="user1">Nguyễn Xuân Bính</option>
                             <option value="user2">Bính</option>
                             <option value="user3">Binh</option>
-                        </select>
+                        </select> --}}
                     </div>
                     <div class="filter-user">
                         <label for="status-filter">Trạng thái:</label>
@@ -337,9 +337,9 @@
                         </div>
 
                         <div class="row row-action">
-                            <button class="btn-viewDetail" data-bs-toggle="modal" data-bs-target="#myModal">Xem chi tiết</button>
-                            <button class="btn-blockAccount">Khóa tài khoản</button>
-                            <button class="btn-DelAccount">Xóa tài khoản</button>
+                            <button class="btn-viewDetail" data-bs-toggle="modal" data-bs-target="#myModal">Details</button>
+                            <button class="btn-blockAccount">Lock</button>
+                            <button class="btn-DelAccount">Unlock</button>
                         </div>
 
                         {{-- Modal thông tin chi tiết khách hàng --}}
@@ -429,6 +429,8 @@
                             </tr>`;
                         tableBody.append(userRow); 
                     });
+                    var rowCount = $('#userTable tbody tr').length;
+                    $('#quantity').text('Quantity: ' + rowCount);
                 },
                 error: function(xhr, status, error) {
                     console.error("Lỗi khi tải dữ liệu người dùng: ", error);
@@ -436,69 +438,169 @@
             });
         }
 
- $(document).ready(function() {
-    var id;
-    var user_tt;
-    loadUserData();
-
-    
-    $('#userTable').on('click', '.btn-view', function() {
-        var userId = $(this).data('id'); 
-        id=userId;
-        $.ajax({
-            url: '/getuserbyid?id=' + userId, 
-            method: 'GET',
-            success: function(user) {
-                user_tt=user;
-                $('#xt_name').val(user.FullName);
-                $('#xt_address').val(user.address);
-                $('#xt_phone').val(user.Phone);
-                $('#xt_status').val(user.isDelete === 0 ? 'Active' : 'Inactive');
-                
-             
-                $('.btn-viewDetail').attr('data-id', userId);
-            },
-            error: function(xhr, status, error) {
-                console.error("Lỗi khi tải dữ liệu chi tiết người dùng: ", error);
-            }
+     
+        $('#status-filter').change(function() {
+            var selectedStatus = $(this).val();
+            loadUserByStatus(selectedStatus);
         });
-    });
 
-    $(document).on('click', '.btn-viewDetail', function() {
-        var userId = id;
-        console.log(userId);
-        $.ajax({
-            url: '/getinvoicebyuser?id=' + userId,  
-            method: 'GET',
-            success: function(orders) {
-                $('#user-name').text(user_tt.FullName);
-                $('#user-createdAt').text(user_tt.createdAt);
-                $('#user-id').text(user_tt.id);
-                
-                var orderList = $('#order-list tbody');
+
+        function loadUserByStatus(isDelete) {
+            $.ajax({
+                url: '/getuserbystatus', 
+                method: 'POST',
+                data: {
+                    isDelete: isDelete,
+                    _token: $('meta[name="csrf-token"]').attr('content') // CSRF Token
+                },
+                success: function(data) {      
+                    var tableBody = $('#userTable tbody');
+                    tableBody.empty();
+                    
+                    data.forEach(function(user) {
+                        var userRow = `
+                            <tr>
+                                <td class="avata-user align-middle">
+                                    <img src="https://picsum.photos/200/300" alt="avatar" />
+                                </td>
+                                <td class="align-middle">${user.FullName}</td>
+                                <td class="align-middle">${new Date(user.createdAt).toLocaleDateString()}</td>
+                                <td class="align-middle">${user.isDelete === 0 ? 'Active' : 'Inactive'}</td>
+                                <td class="btn-preview align-middle">
+                                    <button class="btn-view" data-id="${user.id}">Xem chi tiết</button>
+                                </td>
+                            </tr>`;
+                        tableBody.append(userRow); 
+                    });
+
+                    // Đếm số lượng dòng
+                    var rowCount = $('#userTable tbody tr').length;
+                    $('#quantity').text('Quantity: ' + rowCount);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Lỗi khi tải dữ liệu người dùng: ", error);
+                }
+            });
+        }
+
+
+        $(document).ready(function() {
+            var id;
+            var user_tt;
+            loadUserData();
+
             
-                orderList.empty(); 
-                orders.forEach(function(order) {
-                    var orderRow = `
-                        <tr>
-                            <td>${order.id}</td>
-                            <td>${new Date(order.createdAt).toLocaleDateString()}</td>
-                            <td>${new Date(order.deliveryDate).toLocaleDateString()}</td>
-                            <td>${order.orderStatus}</td>
-                            <td>${order.totalAmount}</td>
-                        </tr>`;
-                    orderList.append(orderRow);
+            $('#userTable').on('click', '.btn-view', function() {
+                var userId = $(this).data('id'); 
+                id=userId;
+                $.ajax({
+                    url: '/getuserbyid?id=' + userId, 
+                    method: 'GET',
+                    success: function(user) {
+                        user_tt=user;
+                        $('#xt_name').val(user.FullName);
+                        $('#xt_address').val(user.address);
+                        $('#xt_phone').val(user.Phone);
+                        $('#xt_status').val(user.isDelete === 0 ? 'Active' : 'Inactive');
+                        
+                    
+                        $('.btn-viewDetail').attr('data-id', userId);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Lỗi khi tải dữ liệu chi tiết người dùng: ", error);
+                    }
                 });
-                $('#total-order').text(orderList.find('tr').length);
-                $('#myModal').modal('show');
-            },
-            error: function(xhr, status, error) {
-                console.error("Lỗi khi tải dữ liệu đơn hàng: ", error);
-            }
+            });
+
+            $(document).on('click', '.btn-viewDetail', function() {
+                var userId = id;
+                console.log(userId);
+                $.ajax({
+                    url: '/getinvoicebyuser?id=' + userId,  
+                    method: 'GET',
+                    success: function(orders) {
+                        $('#user-name').text(user_tt.FullName);
+                        $('#user-createdAt').text(user_tt.createdAt);
+                        $('#user-id').text(user_tt.id);
+                        
+                        var orderList = $('#order-list tbody');
+                    
+                        orderList.empty(); 
+                        orders.forEach(function(order) {
+                            var orderRow = `
+                                <tr>
+                                    <td>${order.id}</td>
+                                    <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+                                    <td>${new Date(order.deliveryDate).toLocaleDateString()}</td>
+                                    <td>${order.orderStatus}</td>
+                                    <td>${order.totalAmount}</td>
+                                </tr>`;
+                            orderList.append(orderRow);
+                        });
+                        $('#total-order').text(orderList.find('tr').length);
+                        $('#myModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Lỗi khi tải dữ liệu đơn hàng: ", error);
+                    }
+                });
+            });
+
+            $(document).on('click', '.btn-blockAccount', function () {
+                var userId = id;
+                console.log(userId);
+                if(user_tt.isDelete==1){
+                    alert('Tài Khoản Này Đang Khóa!');
+                    return;
+                }
+                $.ajax({
+                    url: '/updatestatususer',
+                    method: 'POST',
+                    data: {
+                        id: userId,
+                        _token: $('meta[name="csrf-token"]').attr('content') 
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Cập nhật trạng thái thành công!');
+                            loadUserData();
+                        } else {
+                            alert('Cập nhật thất bại: ' + response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Có lỗi xảy ra: ' + xhr.responseJSON.message);
+                    }
+                });
+            });
+
+            $(document).on('click', '.btn-DelAccount', function () {
+                var userId = id;
+                console.log(userId);
+                if(user_tt.isDelete==0){
+                    alert('Tài Khoản Này Đang Hoạt Động!');
+                    return;
+                }
+                $.ajax({
+                    url: '/updatestatususer',
+                    method: 'POST',
+                    data: {
+                        id: userId,
+                        _token: $('meta[name="csrf-token"]').attr('content') 
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Cập nhật trạng thái thành công!');
+                            loadUserData();
+                        } else {
+                            alert('Cập nhật thất bại: ' + response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Có lỗi xảy ra: ' + xhr.responseJSON.message);
+                    }
+                });
+            });
         });
-    });
-});
-
-
 </script>
 @endsection
