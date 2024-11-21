@@ -152,6 +152,15 @@
             color: #ff9900;
         }
 
+        .modal__add-category{
+            width: 800px;
+        }
+
+        .input__add-category{
+            padding: 10px 20px;
+            margin-right: 10px;
+            width: 100%;
+        }
         /* nảy của modal sửa sp */
         .customer__modal-info {
             max-width: 1000px;
@@ -281,7 +290,36 @@
             <div class="col-md-8" >
                 <button class="btn_excel"><i class="fa-solid fa-file-excel"></i> Nhập từ Excel</button>
                 <button class="btn_excel"><i class="fa-solid fa-file-excel"></i> Xuất ra Excel</button>
-                <button class="btn_addcategory"> + Thêm danh mục</button>
+                <button class="btn_addcategory" data-bs-toggle="modal" data-bs-target="#modalAddCategory"> + Thêm danh mục</button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalAddCategory">
+            <div class="modal-dialog modal__add-category">
+                <div class="modal-content">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="modal__title-detailVariant">
+                            <h5>Thêm danh mục mới</h5>
+                        </div>
+
+                        <div class="form__input-category"> 
+                             <label>Nhập tên danh mục</label>
+                             <input placeholder="Tên danh mục" class="input__add-category"/>
+                        </div>
+                       
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <div class="col-md-10">
+                           <button class="btn btn-primary">Thêm</button>
+                        </div>
+                        <div class="col-md-2 ">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Đóng</button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
 
