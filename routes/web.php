@@ -16,8 +16,22 @@ use Illuminate\Support\Facades\Route;
 Route::get('/admin', function () {
     return view('sign-in');
 });
-//
 
+
+include 'admin.php';
+Route::get('/user', function () {
+    return view('user-management');
+});
+
+Route::get('/product', function () {
+    return view('product.testproduct-management');
+});
+
+Route::get('/category', function () {
+    return view('category.testCategory');
+});
+
+Route::post('/register',[App\Http\Controllers\AdminController::class,'register']);
 Route::post('/login',[App\Http\Controllers\AdminController::class,'login']);
 Route::get('/product-management.html',[App\Http\Controllers\AdminController::class,'showProductManagement']);
 

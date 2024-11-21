@@ -1,8 +1,10 @@
-@section('js')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+@extends('layout.index')
+@section('title', 'Danh sách danh mục')
 
+@section('css')
     <!-- Thêm CSS tùy chỉnh nếu cần -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  
     <style>
         .wrapper {
             min-height: 100vh;
@@ -34,7 +36,7 @@
             box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
         }
 
-        .btn_addproduct {
+        .btn_addcategory {
             background-color: #18a103;
             color: #ffffff;
             border: 2px solid #1ac100;
@@ -43,7 +45,7 @@
             cursor: pointer;
         }
 
-        .btn_addproduct:hover {
+        .btn_addcategory:hover {
             background-color: #ffffff;
             color: #18a103;
             box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
@@ -275,70 +277,34 @@
 @section('content')
     <div class="col-md-12 wrapper">
 
-        {{-- phần thêm sản phẩm + show sản phẩm --}}
-        <div class="row row_action">
-            <div class="col-md-8">
+        <div class="row row-action">
+            <div class="col-md-8" >
                 <button class="btn_excel"><i class="fa-solid fa-file-excel"></i> Nhập từ Excel</button>
                 <button class="btn_excel"><i class="fa-solid fa-file-excel"></i> Xuất ra Excel</button>
-                <button class="btn_addproduct"> + Thêm sản phẩm</button>
-            </div>
-
-            <div class="col-md-4 col_showproduct">
-                <label>Số lượng sản phẩm hiển thị:</label>
-                <select id="user-filter" class="dropdown">
-                    <option value="10">10</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
+                <button class="btn_addcategory"> + Thêm danh mục</button>
             </div>
         </div>
 
-        {{-- phần search + lọc sản phẩm --}}
         <div class="row row__searchFilter">
             <div class="col-md-6">
-                {{-- search --}}
                 <div class="form_search">
                     <form>
                         <div class="search-container">
-                            <input type="text" placeholder="Tìm kiếm sản phẩm..." />
+                            <input type="text" placeholder="Tìm kiếm danh mục..." />
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </div>
                     </form>
                 </div>
             </div>
-
-            {{-- Lọc - ban đầu vô hiệu hóa nút danh mục con, khi chọn danh mục r sẽ load danh mục con theo danh mục cha --}}
-            <div class="col-md-6 col-filter">
-                <div class="form_filter">
-                    <label>Tên danh mục</label>
-                    <select id="user-filter" class="dropdown">
-                        <option value="">Nhẫn</option>
-                        <option value="">Dây chuyền</option>
-                        <option value="">Bông tai</option>
-                    </select>
-                </div>
-
-                <div class="form_filter">
-                    <label>Danh mục con</label>
-                    <select id="user-filter" class="dropdown">
-                        <option value="">Nhẫn trơn</option>
-                        <option value="">Nhẫn đính hạt</option>
-                        <option value="">Nhẫn gì đó</option>
-                    </select>
-                </div>
-            </div>
         </div>
 
-        {{-- phần bảng sản phẩm --}}
         <div class="row row-data">
             <div class="col-md-12">
                 <table>
                     <thead class="header_table">
                         <tr>
                             <th></th>
-                            <th>Tên sản phẩm</th>
-                            <th>Danh mục</th>
-                            <th>Danh mục con</th>
+                            <th>Tên danh mục</th>
                             <th>Ngày cập nhật</th>
                             <th></th>
                             <th></th>
@@ -349,9 +315,7 @@
                             <td class="img_product text-center">
                                 <img src="https://picsum.photos/200/300" alt="img" />
                             </td>
-                            <td>Nhẫn gì hok bic</td>
                             <td>Nhẫn</td>
-                            <td>Danh mục đây</td>
                             <td>20/11/2024</td>
                             <td class="text-center">
                                 <button class="btn__edit-product" data-bs-toggle="modal" data-bs-target="#modalProduct"><i
@@ -360,7 +324,7 @@
                             </td>
                             <td class="text-center">
                                 <button class="btn__view-variant" data-bs-toggle="modal" data-bs-target="#modalVariant">Xem
-                                    biến thể</button>
+                                   danh mục con</button>
                             </td>
                         </tr>
                     </tbody>
@@ -370,39 +334,17 @@
                 <div class="modal fade" id="modalProduct">
                     <div class="modal-dialog customer__modal-info">
                         <div class="modal-content">
-
                             <!-- Modal body -->
                             <div class="modal-body">
                                 <div class="row">
                                     <div class="col-md-8">
                                         <div class="row">
                                             <div class="col-md-12 form__input-product">
-                                                <label for="productName">Tên sản phẩm</label>
-                                                <input id="productName" value="Tên sản phẩm nè"
-                                                    placeholder="Tên sản phẩm" />
+                                                <label for="productName">Tên danh mục</label>
+                                                <input id="productName" value="Tên danh mục"
+                                                    placeholder="Tên danh mục" />
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6 form__input-product">
-                                                <label for="categoryName">Danh mục</label>
-                                                <input id="categoryName" value="Tên danh mục nè" placeholder="Danh mục" />
-                                            </div>
-                                            <div class="col-md-6 form__input-product">
-                                                <label for="subCategoryName">Danh mục con</label>
-                                                <input id="subCategoryName" value="Têm Danh mục con"
-                                                    placeholder="Danh mục con" />
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label for="productDes">Mô tả sản phẩm</label>
-                                            <textarea id="productDes" class="product-des" placeholder="Nhập mô tả sản phẩm" rows="5"></textarea>
-                                        </div>
-                                    </div>
-                                    {{-- cột hình ảnh --}}
-                                    <div class="col-md-4">
-                                        <input type="file" class="form-control" accept="image/*" multiple
-                                            id="imageInput" />
-                                        <div id="imagePreview"></div>
                                     </div>
                                 </div>
                             </div>
@@ -425,30 +367,24 @@
                             <!-- Modal body -->
                             <div class="modal-body">
                                 <div class="modal__title-detailVariant">
-                                    <h5>Danh sách biến thể của sản phẩm: <span>Tên sản phẩm</span></h5>
+                                    <h5>Danh mục con của danh mục: <span>Tên danh mục</span></h5>
                                 </div>
                                 <div class="table__data-variant">
                                     <table>
                                         <thead class="header__table-variant">
                                             <tr>
-                                                <th>Kích cỡ</th>
-                                                <th>Giá (VNĐ)</th>
-                                                <th>Số lượng tồn</th>
-                                                <th>Trạng thái</th>
+                                                <th>Tên danh mục con</th>
                                                 <th>Ngày cập nhật</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
                                         <tbody id="variantTableBody">
                                             <tr>
-                                                <td><input value="L" readonly /></td>
-                                                <td><input value="5.000.000" readonly /></td>
-                                                <td><input value="100" readonly /></td>
-                                                <td><input value="Còn kinh doanh" readonly /></td>
+                                                <td><input value="Nhẫn cưới" readonly /></td>
                                                 <td><input value="20/11/2024" readonly /></td>
                                                 <td><i class="fa-solid fa-trash btn__detele-variant"
                                                         style="color: #ff0000;" data-bs-toggle="tooltip"
-                                                        title="Xóa biến thể"></i></td>
+                                                        title="Xóa danh mục con"></i></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -457,10 +393,10 @@
                             <!-- Modal footer -->
                             <div class="modal-footer">
                                 <div class="col-md-8">
-                                    <button class="btn__edit-variant">Chỉnh sửa biến thể</button>
+                                    <button class="btn__edit-variant">Chỉnh sửa danh mục </button>
                                     <button class="btn__save-variant"><i class="fa-solid fa-floppy-disk"></i>Lưu
                                         thay đổi</button>
-                                    <button class="btn__add-variant">+ Thêm biến thể</button>
+                                    <button class="btn__add-variant">+ Thêm danh mục con</button>
                                 </div>
                                 <div class="col-md-4 btn__close-modal">
                                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Đóng</button>
@@ -473,7 +409,6 @@
 
             </div>
         </div>
-
 
     </div>
 @endsection
@@ -520,25 +455,16 @@
 
                 // Tạo các ô input trong dòng mới
                 const sizeCell = document.createElement("td");
-                const priceCell = document.createElement("td");
-                const quantityCell = document.createElement("td");
-                const statusCell = document.createElement("td");
                 const updateDateCell = document.createElement("td");
                 const deleteCell = document.createElement("td");
 
                 sizeCell.innerHTML = '<input value="" placeholder="Kích cỡ" />';
-                priceCell.innerHTML = '<input value="" placeholder="Giá (VNĐ)" />';
-                quantityCell.innerHTML = '<input value="" placeholder="Số lượng tồn" />';
-                statusCell.innerHTML = '<input value="" placeholder="Trạng thái" />';
                 updateDateCell.innerHTML = '<input value="" placeholder="Ngày cập nhật" />';
                 deleteCell.innerHTML =
                     '<i class="fa-solid fa-trash btn__detele-variant"style="color: #ff0000;" data-bs-toggle="tooltip" title="Xóa biến thể"></i>'
 
                 // Thêm các ô vào dòng mới
                 newRow.appendChild(sizeCell);
-                newRow.appendChild(priceCell);
-                newRow.appendChild(quantityCell);
-                newRow.appendChild(statusCell);
                 newRow.appendChild(updateDateCell);
                 newRow.appendChild(deleteCell);
 
@@ -558,27 +484,8 @@
         })
     </script>
 
-    {{-- xem trước ảnh lúc upload --}}
-    <script>
-        document.getElementById("imageInput").addEventListener("change", function(e) {
-            const files = e.target.files;
-            const preview = document.getElementById("imagePreview");
-            preview.innerHTML = "";
+    
 
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const reader = new FileReader();
 
-                reader.onload = function(event) {
-                    const img = document.createElement("img");
-                    img.src = event.target.result;
-                    img.style.width = "100px"; 
-                    img.style.margin = "5px";
-                    preview.appendChild(img);
-                };
 
-                reader.readAsDataURL(file); 
-            }
-        });
-    </script>
 @endsection
