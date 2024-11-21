@@ -59,7 +59,7 @@
     @if($invoices && count($invoices) > 0)
         @foreach($invoices as $invoice)
             <div class="invoice">
-                <p><strong>Mã Đơn Hàng:</strong> {{ $invoice->id }}</p>
+                <p><strong>Mã Đơn Hàng:</strong> {{ $invoice->invoice_id }}</p>
                 <p><strong>Mã Voucher:</strong> {{ $invoice->voucherCode ?? 'N/A' }}</p>
                 <p><strong>Tên Khách Hàng:</strong> {{ $invoice->user->FullName ?? 'N/A' }}</p>
                 <p><strong>Số Điện Thoại:</strong> {{ $invoice->phoneNumber ?? 'N/A' }}</p>

@@ -25,6 +25,7 @@ Route::get('/product-management.html',[App\Http\Controllers\AdminController::cla
 
 Route::get('/invoice-management.html',[App\Http\Controllers\AdminController::class,'showInvoice']);
 Route::get('/invoice', [App\Http\Controllers\AdminController::class, 'Invoice']);
+Route::put('/updateorderstatus', [App\Http\Controllers\AdminController::class, 'updateOrderStatus']);
 Route::get('/export-pdf', [App\Http\Controllers\AdminController::class, 'exportPdf']);
 
 Route::get('/statistics.html', [App\Http\Controllers\AdminController::class, 'Statistics']);

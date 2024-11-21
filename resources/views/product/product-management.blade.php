@@ -269,6 +269,12 @@
         .btn__detele-variant {
             cursor: pointer;
         }
+        #variant-table input[type="number"] {
+            max-width: 100px;
+        }
+        .input-group {
+            max-width: 200px;
+        }
     </style>
 
 @endsection
@@ -329,6 +335,60 @@
                 </div>
             </div>
         </div>
+        
+        <div class="container">
+            <h2 class="mb-4">Quản lý danh mục biến thể</h2>
+            <div class="card p-3 mb-4">
+                <h4>Chọn kích thước</h4>
+                <div id="size-options" class="d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input size-checkbox" type="checkbox" value="48" id="size48">
+                        <label class="form-check-label" for="size48">Size 48</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input size-checkbox" type="checkbox" value="50" id="size50">
+                        <label class="form-check-label" for="size50">Size 50</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input size-checkbox" type="checkbox" value="52" id="size52">
+                        <label class="form-check-label" for="size52">Size 52</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input size-checkbox" type="checkbox" value="54" id="size54">
+                        <label class="form-check-label" for="size54">Size 54</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input size-checkbox" type="checkbox" value="56" id="size56">
+                        <label class="form-check-label" for="size56">Size 56</label>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label for="price" class="form-label">Giá (VNĐ):</label>
+                    <input type="number" id="price" class="form-control" placeholder="Nhập giá" min="0">
+                </div>
+                <div class="mt-3">
+                    <label for="quantity" class="form-label">Số lượng:</label>
+                    <input type="number" id="quantity" class="form-control" placeholder="Nhập số lượng" min="0">
+                </div>
+                <button id="create-variant" class="btn btn-primary mt-3">Tạo Mẫu</button>
+            </div>
+        
+            <div class="card p-3">
+                <h4>Danh sách biến thể</h4>
+                <table class="table table-bordered mt-3" id="variant-table">
+                    <thead>
+                        <tr>
+                            <th>Size</th>
+                            <th>Giá (VNĐ)</th>
+                            <th>Số lượng</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
 
         {{-- phần bảng sản phẩm --}}
         <div class="row row-data">
@@ -481,6 +541,7 @@
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     {{-- xử lý btn chỉnh sửa, thêm biến thể với btn lưu  trong modal biến thể sp --}}
     <script>
@@ -583,6 +644,70 @@
         });
     </script>
 
+<script>
+    const variants = [];
 
+    $(document).ready(function () {
+        // Tạo danh sách biến thể
+        $("#create-variant").on("click", function () {
+            const selectedSizes = $(".size-checkbox:checked").map(function () {
+                return $(this).val();
+            }).get();
 
+            const price = parseFloat($("#price").val());
+            const quantity = parseInt($("#quantity").val());
+
+            if (!selectedSizes.length || isNaN(price) || isNaN(quantity)) {
+                alert("Vui lòng chọn size, nhập giá và số lượng!");
+                return;
+            }
+
+            selectedSizes.forEach(size => {
+                if (!variants.some(variant => variant.size === size)) {
+                    variants.push({ size, price, quantity });
+                }
+            });
+
+            renderVariantTable();
+        });
+
+        // Hiển thị danh sách biến thể trong bảng
+        function renderVariantTable() {
+            const tableBody = $("#variant-table tbody");
+            tableBody.empty();
+
+            variants.forEach((variant, index) => {
+                tableBody.append(`
+                    <tr>
+                        <td>${variant.size}</td>
+                        <td><input type="number" class="form-control price-input" data-index="${index}" value="${variant.price}" /></td>
+                        <td><input type="number" class="form-control quantity-input" data-index="${index}" value="${variant.quantity}" /></td>
+                        <td>
+                            <button class="btn btn-danger btn-sm delete-variant" data-index="${index}">Xóa</button>
+                        </td>
+                    </tr>
+                `);
+            });
+
+            // Cập nhật giá khi chỉnh sửa
+            $(".price-input").on("input", function () {
+                const index = $(this).data("index");
+                variants[index].price = parseFloat($(this).val()) || 0;
+            });
+
+            // Cập nhật số lượng khi chỉnh sửa
+            $(".quantity-input").on("input", function () {
+                const index = $(this).data("index");
+                variants[index].quantity = parseInt($(this).val()) || 0;
+            });
+
+            // Xóa biến thể
+            $(".delete-variant").on("click", function () {
+                const index = $(this).data("index");
+                variants.splice(index, 1);
+                renderVariantTable();
+            });
+        }
+    });
+</script>
 @endsection

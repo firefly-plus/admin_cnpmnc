@@ -28,14 +28,15 @@
             <div class="col-md-4">
                 <select class="form-control" id="filter-status">
                     <option value="">Chọn trạng thái</option>
-                    <option value="all">Tất Cả</option>
-                    <option value="chothanhtoan">Chờ Thanh Toán</option>
-                    <option value="choxacnhan">Chờ Xác Nhận</option>
-                    <option value="cholayhang">Chờ Lấy Hàng</option>
-                    <option value="danggiahang">Đang Giao Hàng</option>
-                    <option value="trahang">Trả Hàng</option>
-                    <option value="duocgiao">Được Giao</option>
-                    <option value="dahuy">Đã Hủy</option>
+                    <option value="">Tất Cả</option>
+                    <option value="Chờ thanh toán">Chờ thanh toán</option>
+                    <option value="Chờ xác nhận">Chờ xác nhận</option>
+                    <option value="Chờ lấy hàng">Chờ lấy hàng</option>
+                    <option value="Chờ giao hàng">Chờ giao hàng</option>
+                    <option value="Trả hàng">Trả hàng</option>
+                    <option value="Được giao">Được giao</option>
+                    <option value="Đã hủy">Đã hủy</option>
+                    <option value="Đã hủy">Đã hoàn thành</option>
                 </select>
             </div>
 
@@ -160,23 +161,23 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 @section('js')
 <script>
-  $(document).ready(function() {
-    // Hàm hiển thị chi tiết hóa đơn
+$(document).ready(function() {
+  
     function showInvoiceDetail(invoiceId) {
         console.log("Fetching invoice details for ID:", invoiceId);
 
         $.ajax({
-            url: '/invoice?id=' + invoiceId, // Lấy chi tiết hóa đơn từ API
+            url: '/invoice?id=' + invoiceId, 
             method: 'GET',
             success: function(response) {
                 console.log("Invoice details fetched:", response);
 
                 if (response && response.length > 0) {
-                    // Lấy thông tin hóa đơn từ API
+              
                     let invoiceData = response[0];
 
-                    // Cập nhật các trường thông tin vào modal
-                    $('#invoice-id').text(invoiceData.id);
+               
+                    $('#invoice-id').text(invoiceData.invoice_id);
                     $('#invoice-voucher-code').text(invoiceData.voucherCode || 'N/A');
                     $('#invoice-phone').text(invoiceData.phoneNumber || 'N/A');
                     $('#invoice-address').text(invoiceData.shippingAddress || 'N/A');
@@ -184,7 +185,7 @@
                     $('#invoice-final-amount').text(invoiceData.finalAmount || '0');
                     $('#invoice-status').text(invoiceData.orderStatus || 'Chưa xác định');
 
-                    // Hiển thị chi tiết các sản phẩm trong hóa đơn
+              
                     if (invoiceData.invoice_details && Array.isArray(invoiceData.invoice_details)) {
                         let invoiceDetailsHtml = '';
                         invoiceData.invoice_details.forEach(function(detail) {
@@ -202,7 +203,7 @@
                         $('#invoice-details-table tbody').html('<tr><td colspan="4">No product details available.</td></tr>');
                     }
 
-                    // Mở modal để hiển thị chi tiết hóa đơn
+             
                     $('#invoiceDetailModal').modal('show');
                 }
             },
@@ -212,7 +213,7 @@
         });
     }
 
-    // Hàm lấy danh sách các hóa đơn và hiển thị trên bảng
+    
     function getInvoices(filters = {}) {
         $.ajax({
             url: '/invoice',
@@ -220,30 +221,47 @@
             data: filters,
             success: function(response) {
                 var tableBody = $("#invoice-body");
-                tableBody.empty(); // Làm sạch bảng trước khi thêm dữ liệu mới
+                tableBody.empty(); 
                 if (Array.isArray(response)) {
                     response.forEach(function(invoice) {
                         var row = `
                             <tr>
-                                <td><input type='checkbox' name='check1' value='${invoice.id}'></td>
-                                <td>${invoice.id}</td>
+                                <td><input type='checkbox' name='check1' value='${invoice.invoice_id}'></td>
+                                <td>${invoice.invoice_id}</td>
                                 <td>${invoice.voucherCode || 'N/A'}</td>
                                 <td>${invoice.phoneNumber || 'N/A'}</td>
                                 <td>${invoice.address || 'N/A'}</td>
                                 <td>${invoice.paymentMethod || 'N/A'}</td>
                                 <td>${invoice.totalAmount || '0'}</td>
-                                <td>${invoice.orderStatus || '0'}</td>
                                 <td>
-                                    <button class='btn btn-primary btn-sm view-detail' type='button' data-id='${invoice.id}' title='Xem Chi Tiết'><i class='fas fa-eye'></i></button>
+                                    <select class="form-control order-status" data-id="${invoice.invoice_id}">
+                                        <option value="Chờ thanh toán" ${invoice.orderStatus === "Chờ thanh toán" ? 'selected' : ''}>Chờ thanh toán</option>
+                                        <option value="Chờ xác nhận" ${invoice.orderStatus === "Chờ xác nhận" ? 'selected' : ''}>Chờ xác nhận</option>
+                                        <option value="Chờ lấy hàng" ${invoice.orderStatus === "Chờ lấy hàng" ? 'selected' : ''}>Chờ lấy hàng</option>
+                                        <option value="Chờ giao hàng" ${invoice.orderStatus === "Chờ giao hàng" ? 'selected' : ''}>Chờ giao hàng</option>
+                                        <option value="Trả hàng" ${invoice.orderStatus === "Trả hàng" ? 'selected' : ''}>Trả hàng</option>
+                                        <option value="Được giao" ${invoice.orderStatus === "Được giao" ? 'selected' : ''}>Được giao</option>
+                                        <option value="Đã hủy" ${invoice.orderStatus === "Đã hủy" ? 'selected' : ''}>Đã hủy</option>
+                                        <option value="Đã hủy" ${invoice.orderStatus === "Đã hoàn thành" ? 'selected' : ''}>Đã hoàn thành</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class='btn btn-primary btn-sm view-detail' type='button' data-id='${invoice.invoice_id}' title='Xem Chi Tiết'><i class='fas fa-eye'></i></button>
                                 </td>
                             </tr>`;
                         tableBody.append(row);
                     });
+  
+                    $(".order-status").on("change", function() {
+                        var invoiceId = $(this).data("id");
+                        var newStatus = $(this).val();
+                        updateOrderStatus(invoiceId, newStatus);
+                    });
 
-                    // Gắn sự kiện cho nút Xem Chi Tiết
+                
                     $(".view-detail").on("click", function() {
                         var invoiceId = $(this).data("id");
-                        showInvoiceDetail(invoiceId); // Gọi hàm để hiển thị chi tiết hóa đơn
+                        showInvoiceDetail(invoiceId);
                     });
                 } else {
                     console.log("Data is not in expected format", response);
@@ -255,7 +273,24 @@
         });
     }
 
-    // Lấy giá trị bộ lọc
+   
+    function updateOrderStatus(invoiceId, newStatus) {
+        $.ajax({
+            url: '/updateorderstatus',
+            method: 'PUT',
+            data: { invoice_id: invoiceId, orderStatus: newStatus },
+            success: function(response) {
+                console.log("Order status updated successfully:", response);
+              
+                getInvoices();
+            },
+            error: function(xhr, status, error) {
+                console.log("Error updating order status:", error);
+            }
+        });
+    }
+
+   
     function getFilterValues() {
         return {
             createdAt: $('#filter-date').val(),
@@ -264,25 +299,27 @@
         };
     }
 
-    // Lọc dữ liệu khi thay đổi bộ lọc
+   
     $("#filter-date, #filter-status, #filter-price").on("change", function() {
         const filters = getFilterValues();
+        console.log(filters);
         getInvoices(filters);
     });
 
-    // Tìm kiếm theo mã đơn hàng
+    
     $("#search-button").on("click", function() {
         const searchValue = $("#search-invoice").val().trim();
         if (searchValue) {
-            getInvoices({ search: searchValue });
+            getInvoices({ id: searchValue });
         } else {
             alert("Vui lòng nhập mã đơn hàng để tìm kiếm!");
         }
     });
 
-    // Lấy danh sách hóa đơn khi tải trang
+    
     getInvoices();
 });
+
 
 </script>
 

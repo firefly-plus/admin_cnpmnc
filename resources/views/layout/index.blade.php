@@ -53,16 +53,19 @@
         class='app-menu__icon bx bx-pie-chart-alt-2'></i><span class="app-menu__label">Báo cáo doanh thu</span></a></li>
       <li><a class="app-menu__item active" href="/invoice-management.html"><i class='app-menu__icon bx bx-task'></i><span
         class="app-menu__label">Quản lý đơn hàng</span></a></li>
-      <li><a class="app-menu__item " href="table-data-table.html"><i class='app-menu__icon bx bx-id-card'></i> <span
-            class="app-menu__label">Quản lý nhân viên</span></a></li>
+      {{-- <li><a class="app-menu__item " href="table-data-table.html"><i class='app-menu__icon bx bx-id-card'></i> <span
+            class="app-menu__label">Quản lý nhân viên</span></a></li> --}}
       <li><a class="app-menu__item" href="user-management.html"><i class='app-menu__icon bx bx-user-voice'></i><span
             class="app-menu__label">Quản lý khách hàng</span></a></li>
       <li><a class="app-menu__item" href="promotion-management.html"><i
               class='app-menu__icon fas fa-tags'></i><span>Quản lý khuyến mãi</span></a>
       </li>
-      <li><a class="app-menu__item" href="voucher-management.html"><i class="app-menu__icon fa fa-ticket"></i>
+      <li><a class="app-menu__item" href="voucher-management.html"><i class="app-menu__icon fa-ticket"></i>
               <span>Quản lý Voucher</span></a>
       </li>
+      <li><a class="app-menu__item" href="product-management.html"><i class="app-menu__icon fas fa-tasks"></i>
+        <span class="app-menu__label">Quản lý danh mục</span></a>
+  </li>
       <li><a class="app-menu__item" href="product-management.html"><i
             class='app-menu__icon bx bx-purchase-tag-alt'></i><span class="app-menu__label">Quản lý sản phẩm</span></a>
       </li>

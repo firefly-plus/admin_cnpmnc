@@ -19,7 +19,25 @@ use Illuminate\Support\Facades\Hash;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+function removeAccents($str) {
+    $accents = array(
+        'à' => 'a', 'á' => 'a', 'ả' => 'a', 'ã' => 'a', 'ạ' => 'a', 'ă' => 'a', 'ằ' => 'a', 'ắ' => 'a', 'ẳ' => 'a', 'ẵ' => 'a', 'ặ' => 'a',
+        'â' => 'a', 'ầ' => 'a', 'ấ' => 'a', 'ẩ' => 'a', 'ẫ' => 'a', 'ậ' => 'a', 'è' => 'e', 'é' => 'e', 'ẻ' => 'e', 'ẽ' => 'e', 'ẹ' => 'e',
+        'ê' => 'e', 'ề' => 'e', 'ế' => 'e', 'ể' => 'e', 'ễ' => 'e', 'ệ' => 'e', 'ì' => 'i', 'í' => 'i', 'ỉ' => 'i', 'ĩ' => 'i', 'ị' => 'i',
+        'ò' => 'o', 'ó' => 'o', 'ỏ' => 'o', 'õ' => 'o', 'ọ' => 'o', 'ô' => 'o', 'ồ' => 'o', 'ố' => 'o', 'ổ' => 'o', 'ỗ' => 'o', 'ộ' => 'o',
+        'ơ' => 'o', 'ờ' => 'o', 'ớ' => 'o', 'ở' => 'o', 'ỡ' => 'o', 'ợ' => 'o', 'ù' => 'u', 'ú' => 'u', 'ủ' => 'u', 'ũ' => 'u', 'ụ' => 'u',
+        'ư' => 'u', 'ừ' => 'u', 'ứ' => 'u', 'ử' => 'u', 'ữ' => 'u', 'ự' => 'u', 'ỳ' => 'y', 'ý' => 'y', 'ỷ' => 'y', 'ỹ' => 'y', 'ỵ' => 'y',
+        'đ' => 'd', 'Đ' => 'd'
+    );
+    $str = strtr($str, $accents);
+    $str = preg_replace('/[^a-zA-Z\s]/', '', $str);
+    $str = preg_replace('/\s+/', ' ', $str);
+    $str = trim($str);
+
+    return $str;
+} 
 
 class AdminController extends Controller
 {
@@ -64,10 +82,41 @@ class AdminController extends Controller
 
     public function Invoice(Request $request)
     {
-       
-        $invoices = Invoice::getAllInvoices($request);
-        return response()->json($invoices);
+        $filteredInvoices = [];
+        if ($request->orderStatus) {
+            $invoices = Invoice::all();
+            $orderStatusWithoutAccents = removeAccents($request->orderStatus);  
+            foreach ($invoices as $invoice) {
+                $orderStatusFromDB = removeAccents($invoice->orderStatus);
+                if (stripos($orderStatusFromDB, $orderStatusWithoutAccents) !== false) {
+                    $filteredInvoices[] = $invoice;
+                }
+            }
+        } else {
+            $filteredInvoices = Invoice::getAllInvoices($request);
+        }
+        return response()->json($filteredInvoices);
     }
+    
+    public function updateOrderStatus(Request $request)
+    {
+        if ($request->invoice_id && $request->orderStatus) {
+            $updated = DB::table('invoice')
+                ->where('invoice_id', $request->invoice_id)
+                ->update(['orderStatus' => $request->orderStatus]);
+            if ($updated === 0) {
+                return response()->json(['error' => 'Invoice not found'], 404);
+            }
+
+            return response()->json(['success' => 'Order status updated successfully']);
+        }
+
+        return response()->json(['error' => 'Missing required parameters'], 400);
+    }
+
+    
+
+    
 
     public function exportPdf(Request $request)
     {
@@ -84,7 +133,7 @@ class AdminController extends Controller
             }
 
             $invoices = Invoice::with('invoiceDetails.productVariation.product')
-                                ->whereIn('id', $selectedInvoices)
+                                ->whereIn('invoice_id', $selectedInvoices)
                                 ->get();
             
             Log::debug('Retrieved invoices: ', $invoices->toArray());
@@ -114,12 +163,12 @@ class AdminController extends Controller
         Log::info('Start of Current Month: ', ['start_of_month' => $start_of_month]);
 
         $total_year = Invoice::whereBetween('createdAt', [$year, $now])
-            ->where('orderStatus', "Completed")
+            ->where('orderStatus', "Đã hoàn thành")
             ->get();
         Log::info('Total invoices in the last year: ', ['total_year' => $total_year->count()]);
 
         $invoicesDay = Invoice::whereDate('createdAt', Carbon::today())
-            ->where('orderStatus', "Completed")
+            ->where('orderStatus', "Đã hoàn thành")
             ->get();
         Log::info('Invoices for today: ', ['invoicesDay' => $invoicesDay->count()]);
 
@@ -173,7 +222,7 @@ class AdminController extends Controller
                                 if ($proDuct_Va->id == $Invoices_De->ID_productVariation) {
                                     Log::info('Invoice Detail:', ['product_variation_id' => $proDuct_Va->id, 'amount' => $Invoices_De->Amount]);
                                     
-                                    if ($Invoices_De->invoice->orderStatus == 'Completed') {
+                                    if ($Invoices_De->invoice->orderStatus == 'Đã hoàn thành') {
                                         
                                         $sumByCate += $Invoices_De->Amount;
                                     }
@@ -209,7 +258,7 @@ class AdminController extends Controller
                 ]);
         
                 if($product->id == $Invoices_De->ID_productVariation) {
-                    if ($Invoices_De->invoice->orderStatus == 'Completed') {
+                    if ($Invoices_De->invoice->orderStatus == 'Đã hoàn thành') {
                         $sumByPro += $Invoices_De->Amount;
                     }
                 }
@@ -274,7 +323,7 @@ class AdminController extends Controller
     
       
         $revenue_per_day = Invoice::whereBetween('createdAt', [$start_time, $end_time])
-                                  ->where('orderStatus', 'Completed')
+                                  ->where('orderStatus', 'Đã hoàn thành')
                                   ->selectRaw('DATE(createdAt) as date, SUM(totalAmount) as revenue')
                                   ->groupBy('date')
                                   ->orderBy('date')
