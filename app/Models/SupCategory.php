@@ -24,4 +24,14 @@ class SupCategory extends Model
     {
         return $this->belongsTo(Category::class, 'categoryId');
     }
+
+   
+
+    // Relationship with Product
+    public function products()
+{
+    return $this->hasMany(Product::class, 'ID_SupCategory');
+}
+
+
 }
