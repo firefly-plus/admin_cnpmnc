@@ -26,5 +26,10 @@ class ProductVariation extends Model
     {
         return $this->belongsTo(Product::class, 'ID_Product');
     }
+
+    public function variationdiscount()
+    {
+        return $this->hasMany(VariationDiscount::class, 'ID_Variation');  
+    }
     
 }

@@ -39,7 +39,7 @@ class Product extends Model
         return $this->belongsTo(SupCategory::class, 'ID_SupCategory');
     }
 
-    // Khai báo mối quan hệ với bảng 'productimage'
+    
     public function productImages()
     {
         return $this->hasMany(ProductImage::class, 'ProductID');
