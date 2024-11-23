@@ -1,3 +1,34 @@
+<!--   
+
+    public function register(Request $request)
+    {
+        
+        $request->validate([
+            'FullName' => 'required|string|max:255',
+            'Phone' => 'required|string|max:15|unique:employees',
+            'Password' => 'required|string|min:1',  
+        ]);
+
+       
+        $hashedPassword = Hash::make($request->Password);
+
+      
+        $employee = Employee::create([
+            'FullName' => $request->FullName,
+            'Phone' => $request->Phone,
+            'Passwords' => $hashedPassword,  
+            'address' => $request->address ?? null,
+            'isDelete' => false,  
+        ]);
+
+        return response()->json([
+            'message' => 'Đăng ký thành công!',
+            'employee' => $employee,
+        ], 201);  
+    } -->
+<!-- Route::post('/register',[App\Http\Controllers\AdminController::class,'register']); -->
+
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
