@@ -19,8 +19,10 @@ class VariationDiscount extends Model
         'status'
     ];
 
+    public $timestamps = false;
+
     // Khai báo mối quan hệ với bảng 'discount'
-    public function discount()
+    public function discount() 
     {
         return $this->belongsTo(Discount::class, 'ID_Discount');
     }

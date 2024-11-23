@@ -1,26 +1,51 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Danh Sách Hóa Đơn</title>
     <style>
-        body 
-        {
+        body {
             font-family: 'DejaVu Sans', sans-serif;
+            margin: 20px;
         }
 
         h1 {
             text-align: center;
         }
+
         .invoice {
             margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
-        .invoice-details {
-            margin-left: 20px;
+
+        .invoice p {
+            margin: 5px 0;
         }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+
+        .invoice-details h3 {
+            margin-top: 20px;
+        }
+
         hr {
             border: 1px solid #ccc;
         }
@@ -34,8 +59,9 @@
     @if($invoices && count($invoices) > 0)
         @foreach($invoices as $invoice)
             <div class="invoice">
-                <p><strong>Mã Đơn Hàng:</strong> {{ $invoice->id }}</p>
+                <p><strong>Mã Đơn Hàng:</strong> {{ $invoice->invoice_id }}</p>
                 <p><strong>Mã Voucher:</strong> {{ $invoice->voucherCode ?? 'N/A' }}</p>
+                <p><strong>Tên Khách Hàng:</strong> {{ $invoice->user->FullName ?? 'N/A' }}</p>
                 <p><strong>Số Điện Thoại:</strong> {{ $invoice->phoneNumber ?? 'N/A' }}</p>
                 <p><strong>Địa Chỉ:</strong> {{ $invoice->shippingAddress ?? 'N/A' }}</p>
                 <p><strong>Phương Thức Thanh Toán:</strong> {{ $invoice->paymentMethod ?? 'N/A' }}</p>
@@ -45,13 +71,26 @@
                 <div class="invoice-details">
                     <h3>Chi Tiết Hóa Đơn</h3>
                     @if($invoice->invoiceDetails && count($invoice->invoiceDetails) > 0)
-                        @foreach($invoice->invoiceDetails as $detail)
-                            <p><strong>ID Sản Phẩm:</strong> {{ $detail->productVariation->product->productName }}</p>
-                            <p><strong>Giá:</strong> {{ number_format($detail->UnitPrice, 2) }} VNĐ</p>
-                            <p><strong>Số Lượng:</strong> {{ $detail->Quantity }}</p>
-                            <p><strong>Thành Tiền:</strong> {{ number_format($detail->Amount, 2) }} VNĐ</p>
-                            <hr>
-                        @endforeach
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID Sản Phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Số Lượng</th>
+                                    <th>Thành Tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($invoice->invoiceDetails as $detail)
+                                    <tr>
+                                        <td>{{ $detail->productVariation->product->productName }}</td>
+                                        <td>{{ number_format($detail->UnitPrice, 2) }} VNĐ</td>
+                                        <td>{{ $detail->Quantity }}</td>
+                                        <td>{{ number_format($detail->Amount, 2) }} VNĐ</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     @else
                         <p>Không có chi tiết hóa đơn.</p>
                     @endif
