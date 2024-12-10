@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class Invoice extends Model
 {
@@ -12,8 +13,10 @@ class Invoice extends Model
 
     protected $table = 'invoice';
 
+    // protected $primaryKey='invoice_id';
     // Các thuộc tính có thể gán
     protected $fillable = [
+        'invoice_id',
         'ID_Employeer',
         'ID_User',
         'totalAmount',
@@ -30,6 +33,10 @@ class Invoice extends Model
         'customerName'
     ];
 
+    // const CREATED_AT = 'createdAt';
+    // const UPDATED_AT = 'updatedAt';
+    public $timestamps = false;
+
     // Các quan hệ
     public function employee()
     {
@@ -42,9 +49,9 @@ class Invoice extends Model
     }
 
     public function invoiceDetails()
-{
-    return $this->hasMany(InvoiceDetail::class, 'ID_Invoice');
-}
+    {
+        return $this->hasMany(InvoiceDetail::class, 'ID_Invoice','invoice_id');
+    }
 
 
 
@@ -56,7 +63,7 @@ class Invoice extends Model
 
         // Các điều kiện lọc (như cũ)
         if ($id = $request->input('id')) {
-            $query->where('id', $id);
+            $query->where('invoice_id', $id);
         }
         if ($customerName = $request->input('customerName')) {
             $query->where('customerName', 'LIKE', '%' . $customerName . '%');
@@ -66,6 +73,7 @@ class Invoice extends Model
         }
         if ($orderStatus = $request->input('orderStatus') && $request->input('orderStatus') != "all") {
             $query->where('orderStatus', $orderStatus);
+          
         }
         if ($totalAmount = $request->input('totalAmount')) {
             $query->where('totalAmount', '>=', $totalAmount);
@@ -85,6 +93,7 @@ class Invoice extends Model
 
         return $query->get();
     }
+    
 
 
 }

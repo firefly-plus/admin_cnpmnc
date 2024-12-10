@@ -23,13 +23,13 @@ class InvoiceDetail extends Model
    
     public function invoice()
     {
-        return $this->belongsTo(Invoice::class, 'ID_Invoice');
+        return $this->belongsTo(Invoice::class, 'ID_Invoice','invoice_id');
     }
     
     public function product()
-{
-    return $this->belongsTo(Product::class, 'ID_productVariation');
-}
+    {
+        return $this->belongsTo(Product::class, 'ID_productVariation');
+    }
 
     
 
