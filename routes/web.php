@@ -54,3 +54,7 @@ Route::get('/getvoucher', [App\Http\Controllers\AdminController::class, 'getVouc
 Route::get('/voucher-management.html', [App\Http\Controllers\AdminController::class, 'showVoucher']);
 
 Route::get('/warehouse-management.html', [App\Http\Controllers\AdminController::class, 'showWareHouse']);
+
+
+
+
