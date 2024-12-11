@@ -52,3 +52,5 @@ Route::post('/getuserbystatus', [App\Http\Controllers\AdminController::class, 'g
 
 Route::get('/getvoucher', [App\Http\Controllers\AdminController::class, 'getVoucher']);
 Route::get('/voucher-management.html', [App\Http\Controllers\AdminController::class, 'showVoucher']);
+
+Route::get('/warehouse-management.html', [App\Http\Controllers\AdminController::class, 'showWareHouse']);

@@ -114,10 +114,6 @@ class AdminController extends Controller
         return response()->json(['error' => 'Missing required parameters'], 400);
     }
 
-    
-
-    
-
     public function exportPdf(Request $request)
     {
         try 
@@ -555,7 +551,11 @@ class AdminController extends Controller
         return response()->json($vouchers);
     }
 
-
+    //quản lí kho
+    public function showWareHouse()
+    {
+        return view('warehouse.warehouse-management');
+    }
     
 
 
