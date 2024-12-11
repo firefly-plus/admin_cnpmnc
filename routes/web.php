@@ -37,6 +37,7 @@ Route::get('/product-management.html',[App\Http\Controllers\AdminController::cla
 
 Route::get('/invoice-management.html',[App\Http\Controllers\AdminController::class,'showInvoice']);
 Route::get('/invoice', [App\Http\Controllers\AdminController::class, 'Invoice']);
+Route::put('/updateorderstatus', [App\Http\Controllers\AdminController::class, 'updateOrderStatus']);
 Route::get('/export-pdf', [App\Http\Controllers\AdminController::class, 'exportPdf']);
 
 Route::get('/statistics.html', [App\Http\Controllers\AdminController::class, 'Statistics']);
@@ -63,3 +64,5 @@ Route::post('/getuserbystatus', [App\Http\Controllers\AdminController::class, 'g
 
 Route::get('/getvoucher', [App\Http\Controllers\AdminController::class, 'getVoucher']);
 Route::get('/voucher-management.html', [App\Http\Controllers\AdminController::class, 'showVoucher']);
+
+Route::get('/warehouse-management.html', [App\Http\Controllers\AdminController::class, 'showWareHouse']);

@@ -175,6 +175,11 @@
             background-color: #f87477;
         }
 
+        .modal{
+            z-index: 999;
+
+        }
+
         .custom-modal-width {
             max-width: 1000px;
             margin-top: -50px;
