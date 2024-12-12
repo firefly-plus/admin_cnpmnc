@@ -87,7 +87,7 @@ class RecommenderController extends Controller
             $similarProducts = collect($similarityMatrix[$selectedIndex])
                 ->map(fn($similarity, $index) => ['index' => $index, 'similarity' => $similarity])
                 ->sortByDesc('similarity')
-                ->skip(1) 
+                ->skip(1)
                 ->map(function ($item) use ($products) {
                     $product = $products[$item['index']];
                     return [
@@ -110,8 +110,13 @@ class RecommenderController extends Controller
             $recommendedProducts = Product::with(['subCategory', 'productImages', 'productVariations.variationdiscount'])
                 ->whereIn('id', array_column($uniqueProducts, 'ID_Product'))
                 ->get();
+                $recommendedProductsIds = $recommendedProducts->pluck('id')->toArray();
+                // $idString = implode(',', $recommendedProductsIds);
 
-            return response()->json($recommendedProducts);
+                // // Gọi stored procedure
+                // $pr = DB::select("call GetProductsByIds(?)", [$idString]);
+
+            return response()->json($ $recommendedProductsIds);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             return response()->json([

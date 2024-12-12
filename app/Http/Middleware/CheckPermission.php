@@ -24,7 +24,7 @@ class CheckPermission
             return redirect('/login')->withErrors('Bạn cần đăng nhập để truy cập');
         }
         $emp=Employee::find($employee->id);
-        // Lấy tất cả quyền của nhân viên
+       
         $permissions = $emp->roles()
             ->with('permissions')
             ->get()
@@ -33,7 +33,7 @@ class CheckPermission
             ->pluck('name')
             ->unique();
 
-        // Lưu quyền vào session
+        
         session()->forget('employee_permissions');
         session()->put('employee_permissions', $permissions);
         

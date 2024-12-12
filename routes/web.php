@@ -2,6 +2,7 @@
 
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DoitraController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +28,7 @@ Route::get('/admin', function () {
 //     Route::post('/login', [App\Http\Controllers\AdminController::class, 'login']);
 // });
 
-Route::post('/login',[App\Http\Controllers\AdminController::class,'login'])->name('login');
+Route::post('/login', [App\Http\Controllers\AdminController::class, 'login'])->name('login');
 Route::get('/product-management.html',[App\Http\Controllers\AdminController::class,'showProductManagement']);
 
 Route::get('/invoice-management.html',[App\Http\Controllers\AdminController::class,'showInvoice']);
@@ -60,6 +61,15 @@ Route::post('/getuserbystatus', [App\Http\Controllers\AdminController::class, 'g
 Route::get('/getvoucher', [App\Http\Controllers\AdminController::class, 'getVoucher']);
 Route::get('/voucher-management.html', [App\Http\Controllers\AdminController::class, 'showVoucher']);
 
+
+//code của vương
+Route::get('/warehouse/warehouse-management.html', [App\Http\Controllers\WarehouseController::class, 'showWareHouse']);
+Route::get('/form-add-don-hang.html', [App\Http\Controllers\WarehouseController::class, 'showFormAddDonHang']);
+// web.php
+Route::get('warehouse/{orderSupplierId}', [App\Http\Controllers\WarehouseController::class, 'showWarehouseDetail'])->name('warehouse.detail');
+
+Route::post('/warehouse/update-stock', [App\Http\Controllers\WarehouseController::class, 'updateStock'])->name('warehouse.updateStock');
+//code của vương
 Route::get('/warehouse-management.html', [App\Http\Controllers\AdminController::class, 'showWareHouse']);
 
 
@@ -68,5 +78,22 @@ Route::get('/getpermission', [App\Http\Controllers\AdminController::class, 'getP
 Route::get('/getrole', [App\Http\Controllers\AdminController::class, 'getRole']);
 Route::get('/getrolepermission', [App\Http\Controllers\AdminController::class, 'getRolePermission']);
 Route::post('/updaterolepermission', [App\Http\Controllers\AdminController::class, 'updateRolePermission']);
+Route::post('/insertrole', [App\Http\Controllers\AdminController::class, 'insertRole']);
+Route::post('/deleterole', [App\Http\Controllers\AdminController::class, 'deleteRole']);
 //AI
 Route::post('/recommender', [App\Http\Controllers\RecommenderController::class, 'timSanPhamTuongTu']);
+
+// employee
+Route::get('/dsemployees', [App\Http\Controllers\AdminController::class, 'DanhSachEmployee']);
+Route::get('/showthemnhanvien',[App\Http\Controllers\AdminController::class,'showThemNV']);
+Route::post('/themnhanvien', [App\Http\Controllers\AdminController::class, 'themNhanVien']);
+
+
+Route::get('/returns.html', [DoitraController::class, 'showAllReturns']);
+
+Route::prefix('api')->group(function () {
+    Route::post('/doitra', [App\Http\Controllers\DoitraController::class, 'store']);
+});
+Route::get('/chitietdonhang/{orderSupplier_id}', [App\Http\Controllers\DoitraController::class, 'getOrderDetails']);
+Route::get('/timkiemdoitra', [DoitraController::class, 'searchReturns']);
+Route::post('/duyetdoitra/{id}', [DoitraController::class, 'approveReturn']);

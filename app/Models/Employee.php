@@ -17,7 +17,7 @@ class Employee extends Authenticatable
     protected $keyType = 'int';
 
     protected $fillable = [
-        'FullName', 'Phone', 'Passwords', 'address', 'isDelete', 'createdAt', 'updatedAt'
+       'id', 'FullName', 'Phone', 'Passwords', 'address', 'isDelete', 'createdAt', 'updatedAt'
     ];
 
     public $timestamps = false;

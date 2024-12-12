@@ -14,6 +14,18 @@
 @section('content')
 
 <div class="container mt-4">
+    <form id="insertRoleForm">
+        @csrf
+        <div class="form-group">
+            <label for="role_name">Tên vai trò:</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="Nhập tên vai trò" required>
+        </div>
+    
+        <button type="button" id="insert" class="btn btn-primary">Thêm Vai Trò</button>
+        <button type="button" id="delete" class="btn btn-danger">Xóa Vai Trò</button>
+    </form>
+    
+    
     <h2 class="text-center mb-4">Danh Sách Quyền Người Dùng</h2>
 
     <!-- Bố cục 3 cột cho các quyền -->
@@ -142,6 +154,7 @@ $(document).ready(function () {
                                         <input type="radio" name="user-role" id="${role.id}" value="${role.id}">
                                         ${role.name}
                                     </div>
+                                    
                                 </div>
                             </div>
                         `;
@@ -164,7 +177,6 @@ $(document).ready(function () {
         });
     }
 
-   
     function filterPermissions(roleId) {
         
         checkedIds = [];
@@ -636,7 +648,57 @@ $(document).ready(function () {
         });
     }
 
-    
+    $('#insert').on('click', function (e) {
+        e.preventDefault();  // Ngừng gửi form mặc định để tránh chuyển trang
+
+        var formData = $('#insertRoleForm').serialize();  // Lấy dữ liệu form bằng selector id
+
+        $.ajax({
+            url: '/insertrole',  // Đường dẫn đến controller xử lý
+            type: 'POST',  // Phương thức gửi là POST
+            data: formData,  // Dữ liệu form
+            success: function () {
+                loadUserRoles();  // Gọi hàm load lại danh sách vai trò sau khi thành công
+            },
+            error: function (xhr, status, error) {
+                var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'Có lỗi xảy ra!';
+                $('#responseMessage').html('<div class="alert alert-danger">' + errorMessage + '</div>');
+            }
+        });
+    });
+
+    $('#delete').on('click', function (e) {  // Sử dụng sự kiện click thay vì submit
+        e.preventDefault();  // Ngừng gửi form mặc định
+
+        if (selectedUserRole == null) {
+            alert("Vui lòng chọn quyền cần xóa.");
+            return;  // Nếu chưa chọn vai trò, không thực hiện yêu cầu
+        }
+
+        // Gọi hàm xóa vai trò
+        deleteRole(selectedUserRole);
+    });
+
+    function deleteRole(roleId) {
+        $.ajax({
+            url: '/deleterole',  // Đường dẫn tới API xóa vai trò (sử dụng POST)
+            method: 'POST',  // Sử dụng phương thức POST
+            data: { id: roleId },  // Gửi ID của vai trò cần xóa
+            success: function(response) {
+                alert('Vai trò đã được xóa thành công!');
+                loadUserRoles();  // Tải lại danh sách vai trò sau khi xóa
+            },
+            error: function(xhr, status, error) {
+                var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'Có lỗi xảy ra khi xóa vai trò!';
+                alert(errorMessage);
+            }
+        });
+    }
+
+
+
+
+
     loadUserRoles();
     loadReport();
     loadReportBlog();
