@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Role extends Model
+class Permission extends Model
 {
     use HasFactory;
 
-    protected $table = 'roles';
+    protected $table = 'permissions';
     protected $primaryKey = 'id';
     public $incrementing = true;
     protected $keyType = 'int';
@@ -20,13 +20,8 @@ class Role extends Model
 
     public $timestamps = false;
 
-    public function employees()
+    public function roles()
     {
-        return $this->belongsToMany(Employee::class, 'employee_roles', 'role_id', 'employee_id');
-    }
-
-    public function permissions()
-    {
-        return $this->belongsToMany(Permission::class, 'role_permissions', 'role_id', 'permission_id');
+        return $this->belongsToMany(Role::class, 'role_permissions', 'permission_id', 'role_id');
     }
 }

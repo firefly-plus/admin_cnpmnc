@@ -7,8 +7,11 @@ use App\Models\Discount;
 use App\Models\Employee;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
+use App\Models\Permission;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Models\Role;
+use App\Models\RolePermission;
 use App\Models\SupCategory;
 use App\Models\User;
 use App\Models\VariationDiscount;
@@ -19,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 function removeAccents($str) {
@@ -55,25 +59,23 @@ class AdminController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'Phone' => 'required|digits:10',
-            'Password' => 'required|string|min:1',
+        $credentials = $request->only('Phone', 'Password');
+       
+        $employee = Employee::where('Phone', $credentials['Phone'])->first();
+        // $employee->Passwords = bcrypt('123'); 
+        // $employee->save();
+       
+        if ($employee && Hash::check($credentials['Password'], $employee->Passwords)) {
+            Auth::guard('employee')->login($employee);
+            return redirect()->intended('/statistics.html');
+        }
+    
+      
+        return back()->withErrors([
+            'Phone' => 'Thông tin đăng nhập không chính xác.',
         ]);
-        $employee = Employee::where('Phone', $request->Phone)->first();
-
-        if ($request->has('rememberMe') && $request->rememberMe == 'on') {
-            Cookie::queue('employee_id', $employee->id, 60 * 24 * 30); 
-            Cookie::queue('employee_name', $employee->FullName, 60 * 24 * 30);
-        }
-        if ($employee && Hash::check($request->Password, $employee->Passwords)) 
-        {
-            session(['employee_id' => $employee->id]); 
-            session(['employee_name' => $employee->FullName]); 
-            return redirect()->to('/statistics.html');
-        } else {
-            return back()->withErrors(['error' => 'Thông tin đăng nhập không chính xác.']);  
-        }
     }
+
 
     public function showInvoice() 
     {
@@ -113,10 +115,6 @@ class AdminController extends Controller
 
         return response()->json(['error' => 'Missing required parameters'], 400);
     }
-
-    
-
-    
 
     public function exportPdf(Request $request)
     {
@@ -553,6 +551,62 @@ class AdminController extends Controller
     {
         $vouchers=Voucher::all();
         return response()->json($vouchers);
+    }
+
+    //quản lí kho
+    public function showWareHouse()
+    {
+        return view('warehouse.warehouse-management');
+    }
+
+    //quản lý quyền
+    public function showPermission()
+    {
+        return view('permission.permission-management');
+    }
+
+    public function getRole()
+    {
+        $role=Role::all();
+        return response()->json($role);
+    }
+
+    public function getPermission(Request $request)
+    {
+        $name = $request->input('name', ''); 
+        $permissions = Permission::where('name', 'like', "%$name%")->get();
+        return response()->json($permissions);
+    }
+
+    public function getRolePermission(Request $request)
+    {
+        $rolepermission=RolePermission::where('role_id',$request->role_id)->get();
+        $rolepermission=$rolepermission->pluck('permission_id');
+        return response()->json($rolepermission);
+    }
+
+    public function updateRolePermission(Request $request)
+    {
+        $role_id = $request->role_id; 
+        $ds_role_permission = $request->ds_role_permission;
+        $role_permissions = RolePermission::where('role_id', $role_id)->pluck('permission_id')->toArray();
+        $permissions_to_add = array_diff($ds_role_permission, $role_permissions);
+        $permissions_to_remove = array_diff($role_permissions, $ds_role_permission);
+        foreach ($permissions_to_add as $permission_id) {
+            RolePermission::create([
+                'role_id' => $role_id,
+                'permission_id' => $permission_id,
+            ]);
+        }
+        RolePermission::where('role_id', $role_id)
+            ->whereIn('permission_id', $permissions_to_remove)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Cập nhật quyền thành công',
+            'added_permissions' => $permissions_to_add,
+            'removed_permissions' => $permissions_to_remove,
+        ], 200);
     }
 
 

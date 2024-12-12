@@ -74,7 +74,7 @@
                           }
                         });
                       </script> --}}
-                      <script>
+                      {{-- <script>
                         document.querySelector('form').addEventListener('submit', function (event) {
                           if (document.getElementById('rememberMe').checked) {
                            
@@ -83,7 +83,7 @@
                             document.cookie = "rememberMe=false; path=/; max-age=0"; // Xóa cookie nếu không chọn "Remember me"
                           }
                         });
-                      </script>
+                      </script> --}}
                       
                       
                       
