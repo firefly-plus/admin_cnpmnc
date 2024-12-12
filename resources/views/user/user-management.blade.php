@@ -1,3 +1,7 @@
+@php
+    $permissions = session('employee_permissions', collect())->toArray(); 
+    // dd($permissions);
+@endphp
 @extends('layout.index')
 @section('title', 'Customer Management')
 
@@ -343,8 +347,11 @@
 
                         <div class="row row-action">
                             <button class="btn-viewDetail" data-bs-toggle="modal" data-bs-target="#myModal">Details</button>
-                            <button class="btn-blockAccount">Lock</button>
-                            <button class="btn-DelAccount">Unlock</button>
+                            @if(in_array('Quản lý khách hàng - Khóa tài khoản khách hàng', $permissions))
+                                <button class="btn-blockAccount">Lock</button>
+                                <button class="btn-DelAccount">Unlock</button>
+                            @endif
+                            
                         </div>
 
                         {{-- Modal thông tin chi tiết khách hàng --}}
