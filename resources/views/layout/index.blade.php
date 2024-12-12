@@ -14,7 +14,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <!-- Main CSS-->
   <link rel="stylesheet" type="text/css" href="/main.css">
@@ -93,6 +93,18 @@
         <li><a class="app-menu__item" href="table-data-money.html"><i class='app-menu__icon bx bx-dollar'></i><span
           class="app-menu__label">Quản Lý Kho</span></a></li>
       @endif
+      <li><a class="app-menu__item" href="category-management.html"><i class="app-menu__icon fas fa-tasks"></i>
+        <span class="app-menu__label">Quản lý danh mục</span></a>
+      </li>
+      <li>
+        <a class="app-menu__item" href="{{ route('suppliers.index') }}">
+          <i class="app-menu__icon fas fa-tasks"></i>
+          <span class="app-menu__label">Quản lý nhà cung cấp</span>
+        </a>
+      </li>
+      <li><a class="app-menu__item" href="product-management.html"><i
+            class='app-menu__icon bx bx-purchase-tag-alt'></i><span class="app-menu__label">Quản lý sản phẩm</span></a>
+      </li>
       {{-- <li><a class="app-menu__item" href="table-data-oder.html"><i class='app-menu__icon bx bx-task'></i><span
             class="app-menu__label">Quản lý đơn hàng</span></a></li> --}}
       <li><a class="app-menu__item" href="table-data-banned.html"><i class='app-menu__icon bx bx-run'></i><span
@@ -100,7 +112,6 @@
           </span></a></li>
       <li><a class="app-menu__item" href="warehouse-management.html"><i class='app-menu__icon bx bx-dollar'></i><span
             class="app-menu__label">Quản Lý Kho</span></a></li>
-=======
 
       {{-- <li><a class="app-menu__item" href="quan-ly-bao-cao.html"><i
             class='app-menu__icon bx bx-pie-chart-alt-2'></i><span class="app-menu__label">Báo cáo doanh thu</span></a>

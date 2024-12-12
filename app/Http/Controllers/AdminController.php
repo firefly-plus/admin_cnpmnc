@@ -560,6 +560,7 @@ class AdminController extends Controller
         return response()->json($vouchers);
     }
 
+
     //quản lí kho
     public function showWareHouse()
     {
@@ -684,13 +685,5 @@ class AdminController extends Controller
         // Trả về phản hồi thành công
         return redirect()->back()->with('success', 'Thêm nhân viên thành công!');;
     }
-
-
-
-
-
-
-
-
 
 }

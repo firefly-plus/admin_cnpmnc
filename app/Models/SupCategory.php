@@ -12,6 +12,13 @@ class SupCategory extends Model
     protected $primaryKey='id';
     protected $keyType = 'string';
     public $incrementing = false;
+    public $timestamps = false;
+    const CREATED_AT = 'createdAt';
+    const UPDATED_AT = 'updatedAt';
+    protected $casts = [
+        'id' => 'string',  // Ép kiểu id thành chuỗi
+    ];
+
     // Các thuộc tính có thể gán
     protected $fillable = [
         'id',

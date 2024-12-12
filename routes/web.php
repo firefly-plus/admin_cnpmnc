@@ -14,6 +14,7 @@ use App\Http\Controllers\DoitraController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
 include 'admin.php';
 
 include 'binh.php';
@@ -21,7 +22,6 @@ include 'binh.php';
 Route::get('/admin', function () {
     return view('sign-in');
 });
-//
 
 // Route::middleware('permission:Báo cáo & Thống kê - Xem báo cáo Layout')->group(function() {
 //     Route::get('/statistics.html', [App\Http\Controllers\AdminController::class, 'Statistics']);
@@ -29,9 +29,21 @@ Route::get('/admin', function () {
 // });
 
 Route::post('/login', [App\Http\Controllers\AdminController::class, 'login'])->name('login');
-Route::get('/product-management.html',[App\Http\Controllers\AdminController::class,'showProductManagement']);
+include 'admin.php';
+Route::get('/user', function () {
+    return view('user-management');
+});
 
-Route::get('/invoice-management.html',[App\Http\Controllers\AdminController::class,'showInvoice']);
+Route::get('/product', function () {
+    return view('product.testproduct-management');
+});
+
+
+Route::post('/register', [App\Http\Controllers\AdminController::class, 'register']);
+Route::post('/login', [App\Http\Controllers\AdminController::class, 'login']);
+Route::get('/product-management.html', [App\Http\Controllers\AdminController::class, 'showProductManagement']);
+
+Route::get('/invoice-management.html', [App\Http\Controllers\AdminController::class, 'showInvoice']);
 Route::get('/invoice', [App\Http\Controllers\AdminController::class, 'Invoice']);
 Route::put('/updateorderstatus', [App\Http\Controllers\AdminController::class, 'updateOrderStatus']);
 Route::get('/export-pdf', [App\Http\Controllers\AdminController::class, 'exportPdf']);
@@ -85,8 +97,37 @@ Route::post('/recommender', [App\Http\Controllers\RecommenderController::class, 
 
 // employee
 Route::get('/dsemployees', [App\Http\Controllers\AdminController::class, 'DanhSachEmployee']);
-Route::get('/showthemnhanvien',[App\Http\Controllers\AdminController::class,'showThemNV']);
+Route::get('/showthemnhanvien', [App\Http\Controllers\AdminController::class, 'showThemNV']);
 Route::post('/themnhanvien', [App\Http\Controllers\AdminController::class, 'themNhanVien']);
+
+Route::get('/category-management.html', [App\Http\Controllers\CategoryController::class, 'showCategoryPage']);
+Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index']);
+Route::post('/category', [App\Http\Controllers\CategoryController::class, 'addCategory']);
+Route::get('/category/{id}', [App\Http\Controllers\CategoryController::class, 'getSubcategoriesByCategoryId']);
+Route::put('/category/{id}', [App\Http\Controllers\CategoryController::class, 'editCategory']);
+Route::delete('/category/{id}', [App\Http\Controllers\CategoryController::class, 'deleteCategory']);
+Route::post('/category/{categoryId}/supcategory', [App\Http\Controllers\CategoryController::class, 'addSupCategory']);
+Route::put('/category/{categoryId}/supcategory/{supCategoryId}', [App\Http\Controllers\CategoryController::class, 'editSupCategory']);
+Route::delete('/category/{categoryId}/supcategory/{supCategoryId}', [App\Http\Controllers\CategoryController::class, 'deleteSupCategory']);
+
+
+Route::resource('suppliers', App\Http\Controllers\SupplierController::class);
+Route::get('/suppliers', [App\Http\Controllers\SupplierController::class, 'index'])->name('suppliers.index');
+// Đảm bảo route này tồn tại
+Route::get('/suppliers/create', [App\Http\Controllers\SupplierController::class, 'create'])->name('suppliers.create');
+
+Route::post('/suppliers', [App\Http\Controllers\SupplierController::class, 'store'])->name('suppliers.store');
+
+Route::get('/suppliers/{id}', [App\Http\Controllers\SupplierController::class, 'show'])->name('suppliers.show');
+
+Route::get('/suppliers/{id}/edit', [App\Http\Controllers\SupplierController::class, 'edit'])->name('suppliers.edit');
+
+Route::put('/suppliers/{id}', [App\Http\Controllers\SupplierController::class, 'update'])->name('suppliers.update');
+Route::patch('/suppliers/{id}', [App\Http\Controllers\SupplierController::class, 'update']);
+Route::delete('suppliers/{id}', [App\Http\Controllers\SupplierController::class, 'destroy'])->name('suppliers.destroy');
+
+
+Route::post('suppliers/{id}/restore', [App\Http\Controllers\SupplierController::class, 'restore'])->name('suppliers.restore');
 
 
 Route::get('/returns.html', [DoitraController::class, 'showAllReturns']);
