@@ -66,7 +66,7 @@
       <li><a class="app-menu__item" href="product-management.html"><i class="app-menu__icon fas fa-tasks"></i>
         <span class="app-menu__label">Quản lý danh mục</span></a>
   </li>
-      <li><a class="app-menu__item" href="product-management.html"><i
+      <li><a class="app-menu__item" href="/danhsachsanpham"><i
             class='app-menu__icon bx bx-purchase-tag-alt'></i><span class="app-menu__label">Quản lý sản phẩm</span></a>
       </li>
       {{-- <li><a class="app-menu__item" href="table-data-oder.html"><i class='app-menu__icon bx bx-task'></i><span

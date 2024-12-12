@@ -14,7 +14,7 @@ class Product extends Model
     protected $keyType = 'string';
     public $incrementing = false;
     protected $fillable = [
-     
+        'id',
         'ID_SupCategory',
         'productName',
         'description',

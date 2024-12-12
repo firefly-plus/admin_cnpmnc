@@ -37,6 +37,7 @@ class ProductController extends Controller
             Log::info('Request data:', $request->all());
             // Tạo sản phẩm mới
             $chuoi=Str::random(5);
+            Log::info('Sản phẩm được tạo:'.$chuoi);
             $product = Product::create([
                 'id'             => $chuoi,
                 'ID_SupCategory' => $request->input('ID_SupCategory'),
@@ -96,7 +97,13 @@ class ProductController extends Controller
             Log::info('Biến thể sản phẩm được thêm:', $productVariation->toArray());
 
 
-            return redirect()->back()->with('success', 'Sản phẩm được thêm thành công.');
+            // return redirect()->back()->with('success', 'Sản phẩm được thêm thành công.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Sản phẩm đã được thêm thành công!',
+                'redirect_url' => route('danhSachSanPham'), // Gọi đúng tên route đã được gán
+            ], 200);
+
         } catch (\Exception $e) {
             
             
