@@ -9,7 +9,7 @@ class ProductImage extends Model
 {
     use HasFactory;
     protected $table = 'productimage';
-
+    
     // Các thuộc tính có thể gán
     protected $fillable = [
         'ProductID',
@@ -19,6 +19,6 @@ class ProductImage extends Model
     // Khai báo mối quan hệ với bảng 'product'
     public function product()
     {
-        return $this->belongsTo(Product::class, 'ProductID');
+        return $this->belongsTo(Product::class, 'ProductID','id');
     }
 }

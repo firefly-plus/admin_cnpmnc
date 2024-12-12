@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+include 'admin.php';
 
 Route::get('/admin', function () {
     return view('sign-in');
