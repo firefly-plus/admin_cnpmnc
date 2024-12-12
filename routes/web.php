@@ -25,7 +25,7 @@ Route::get('/admin', function () {
 //     Route::post('/login', [App\Http\Controllers\AdminController::class, 'login']);
 // });
 
-Route::post('/login',[App\Http\Controllers\AdminController::class,'login'])->middleware('permission:Báo cáo & Thống kê - Xem báo cáo Layout');
+Route::post('/login',[App\Http\Controllers\AdminController::class,'login'])->name('login');
 Route::get('/product-management.html',[App\Http\Controllers\AdminController::class,'showProductManagement']);
 
 Route::get('/invoice-management.html',[App\Http\Controllers\AdminController::class,'showInvoice']);

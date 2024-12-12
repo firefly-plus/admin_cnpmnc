@@ -1,3 +1,7 @@
+@php
+    $permissions = session('employee_permissions', collect())->toArray(); 
+   
+@endphp
 @extends('layout.index')
 
 @section('title', 'Quản lý sản phẩm')
@@ -6,8 +10,12 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Quản lý sản phẩm</h2>
-        <a href="{{ url('/showthemsanpham') }}" class="btn btn-primary" >Thêm sản phẩm mới</a>
+        
+        @if(in_array('Quản lý sản phẩm - Thêm nhiều sản phẩm', $permissions))
+            <a href="{{ url('/showthemsanpham') }}" class="btn btn-primary" >Thêm sản phẩm mới</a>
+        @endif
     </div>
+   
 
    
 
@@ -55,29 +63,34 @@
                         @endif
                     </td>
                     <td>
-                        @if ($product->isDelete == 1)
+                        @if ($product->isDelete == 0)
                             <span class="badge bg-success">Còn bán</span>
                         @else
                             <span class="badge bg-secondary">Ngưng bán</span>
                         @endif
                     </td>
                     <td>
-                        <a href="javascript:void(0);" 
-                            class="btn btn-warning btn-sm edit-btn" 
-                            data-id="{{ $product->id }}" 
-                            data-name="{{ $product->productName }}" 
-                            data-price="{{ $product->productVariations->pluck('Price')->implode(', ') }}" 
-                            data-stock="{{ $product->productVariations->pluck('stock')->implode(', ') }}" 
-                            data-size="{{ $product->productVariations->pluck('size')->implode(', ') }}"
-                            data-description="{{ $product->description ?? '' }}">
-                            Sửa
-                        </a>
+                        @if(in_array('Quản lý sản phẩm - Chỉnh sửa sản phẩm', $permissions))
+                            <a href="javascript:void(0);" 
+                                class="btn btn-warning btn-sm edit-btn" 
+                                data-id="{{ $product->id }}" 
+                                data-name="{{ $product->productName }}" 
+                                data-price="{{ $product->productVariations->pluck('Price')->implode(', ') }}" 
+                                data-stock="{{ $product->productVariations->pluck('stock')->implode(', ') }}" 
+                                data-size="{{ $product->productVariations->pluck('size')->implode(', ') }}"
+                                data-description="{{ $product->description ?? '' }}">
+                                Sửa
+                            </a>
+                        @endif
                         <form action="{{ url('/xoasanpham/' . $product->id) }}" method="POST" class="d-inline-block">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">
-                                Xóa
-                            </button>
+                            @if(in_array('Quản lý sản phẩm - Xóa sản phẩm', $permissions))
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">
+                                    Xóa
+                                </button>
+                            @endif
+                            
                         </form>
                     </td>
                 </tr>

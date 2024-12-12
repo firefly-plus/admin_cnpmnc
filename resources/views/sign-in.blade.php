@@ -44,7 +44,7 @@
                   <p class="mb-0">Enter your email and password to sign in</p>
                 </div>
                 <div class=" card-body">
-                  <form action="/login" method="POST" role="form" autocomplete="off">
+                  <form action="{{route('login')}}" method="POST">
                     @csrf
 
                 
