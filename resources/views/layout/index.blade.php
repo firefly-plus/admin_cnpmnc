@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+
 
   <!-- Main CSS-->
   <link rel="stylesheet" type="text/css" href="/main.css">
@@ -74,7 +74,7 @@
       <li><a class="app-menu__item" href="table-data-banned.html"><i class='app-menu__icon bx bx-run'></i><span
             class="app-menu__label">Quản lý nội bộ
           </span></a></li>
-      <li><a class="app-menu__item" href="table-data-money.html"><i class='app-menu__icon bx bx-dollar'></i><span
+      <li><a class="app-menu__item" href="warehouse-management.html"><i class='app-menu__icon bx bx-dollar'></i><span
             class="app-menu__label">Quản Lý Kho</span></a></li>
       {{-- <li><a class="app-menu__item" href="quan-ly-bao-cao.html"><i
             class='app-menu__icon bx bx-pie-chart-alt-2'></i><span class="app-menu__label">Báo cáo doanh thu</span></a>

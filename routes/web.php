@@ -53,4 +53,7 @@ Route::post('/getuserbystatus', [App\Http\Controllers\AdminController::class, 'g
 Route::get('/getvoucher', [App\Http\Controllers\AdminController::class, 'getVoucher']);
 Route::get('/voucher-management.html', [App\Http\Controllers\AdminController::class, 'showVoucher']);
 
-Route::get('/warehouse-management.html', [App\Http\Controllers\AdminController::class, 'showWareHouse']);
+Route::get('/warehouse-management.html', [App\Http\Controllers\WarehouseController::class, 'showWareHouse']);
+Route::get('/form-add-don-hang.html', [App\Http\Controllers\WarehouseController::class, 'showFormAddDonHang']);
+// web.php
+Route::get('warehouse/{orderSupplierId}', [App\Http\Controllers\WarehouseController::class, 'showWarehouseDetail'])->name('warehouse.detail');
