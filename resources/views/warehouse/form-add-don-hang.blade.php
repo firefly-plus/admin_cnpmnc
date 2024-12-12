@@ -110,12 +110,17 @@
         const supplierId = document.getElementById('supplierSelect').value; // Lấy ID nhà cung cấp
         const employeerId = 2;  // Giả sử bạn muốn gửi ID của nhân viên (có thể thay đổi theo nhu cầu)
         const orderDate = new Date().toISOString().split('T')[0];  // Lấy ngày hiện tại
-
+        // Tính tổng tiền của đơn hàng
+        let totalAmount = 0;
+            products.forEach(product => {
+                totalAmount += product.purchasePrice * product.quantity; // Tổng tiền = giá * số lượng
+            });
         // Chuyển đổi sản phẩm thành dữ liệu yêu cầu cho API
         const orderData = {
             supplierId: supplierId,
             employeerId: employeerId,
             orderDate: orderDate,
+            totalPrice: totalAmount,
             items: products.map(product => ({
                 productVariationId: product.variationId,
                 quantityOrdered: product.quantity,
