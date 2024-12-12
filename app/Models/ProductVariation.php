@@ -29,7 +29,7 @@ class ProductVariation extends Model
 
     public function variationdiscount()
     {
-        return $this->hasMany(VariationDiscount::class, 'ID_Variation');  
+        return $this->hasMany(VariationDiscount::class, 'ID_Variation');
     }
-    
+
 }

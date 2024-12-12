@@ -29,5 +29,25 @@ class WarehouseController extends Controller
         return view('warehouse.form-add-don-hang');
     }
 
+    public function updateStock(Request $request)
+    {
+        $data = $request->validate([
+            'ID_Variation' => 'required|string',
+            'newStock' => 'required|integer|min:0',
+            'orderID' => 'required|string',
+        ]);
+        dd($data);
+        $response = Http::post('http://localhost:8017/v1/product/update-stock', [
+            'ID_Variation' => $data['ID_Variation'],
+            'newStock' => $data['newStock'],
+            'orderID' => $data['orderID'],
+        ]);
+
+        if ($response->successful()) {
+            return response()->json(['success' => true, 'message' => 'Cập nhật thành công']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Cập nhật thất bại'], 500);
+        }
+    }
 
 }

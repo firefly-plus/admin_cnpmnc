@@ -55,8 +55,10 @@ Route::get('/voucher-management.html', [App\Http\Controllers\AdminController::cl
 
 
 //code của vương
-Route::get('/warehouse-management.html', [App\Http\Controllers\WarehouseController::class, 'showWareHouse']);
+Route::get('/warehouse/warehouse-management.html', [App\Http\Controllers\WarehouseController::class, 'showWareHouse']);
 Route::get('/form-add-don-hang.html', [App\Http\Controllers\WarehouseController::class, 'showFormAddDonHang']);
 // web.php
 Route::get('warehouse/{orderSupplierId}', [App\Http\Controllers\WarehouseController::class, 'showWarehouseDetail'])->name('warehouse.detail');
+
+Route::post('/warehouse/update-stock', [App\Http\Controllers\WarehouseController::class, 'updateStock'])->name('warehouse.updateStock');
 //code của vương
