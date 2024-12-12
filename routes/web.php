@@ -24,7 +24,7 @@ Route::get('/admin', function () {
 //     Route::post('/login', [App\Http\Controllers\AdminController::class, 'login']);
 // });
 
-Route::post('/login',[App\Http\Controllers\AdminController::class,'login'])->middleware('permission:Báo cáo & Thống kê - Xem báo cáo Layout');
+Route::post('/login', [App\Http\Controllers\AdminController::class, 'login'])->name('login');
 Route::get('/product-management.html',[App\Http\Controllers\AdminController::class,'showProductManagement']);
 
 Route::get('/invoice-management.html',[App\Http\Controllers\AdminController::class,'showInvoice']);
@@ -64,5 +64,7 @@ Route::get('/getpermission', [App\Http\Controllers\AdminController::class, 'getP
 Route::get('/getrole', [App\Http\Controllers\AdminController::class, 'getRole']);
 Route::get('/getrolepermission', [App\Http\Controllers\AdminController::class, 'getRolePermission']);
 Route::post('/updaterolepermission', [App\Http\Controllers\AdminController::class, 'updateRolePermission']);
+Route::post('/insertrole', [App\Http\Controllers\AdminController::class, 'insertRole']);
+Route::post('/deleterole', [App\Http\Controllers\AdminController::class, 'deleteRole']);
 //AI
 Route::post('/recommender', [App\Http\Controllers\RecommenderController::class, 'timSanPhamTuongTu']);

@@ -66,6 +66,12 @@ class AdminController extends Controller
         // $employee->save();
        
         if ($employee && Hash::check($credentials['Password'], $employee->Passwords)) {
+            if($employee->isDelete==1)
+            {
+                return back()->withErrors([
+                    'Phone' => 'Tài Khoản Không Hoạt Động',
+                ]);
+            }
             Auth::guard('employee')->login($employee);
             return redirect()->intended('/statistics.html');
         }
@@ -609,6 +615,36 @@ class AdminController extends Controller
         ], 200);
     }
 
+    public function insertRole(Request $request)
+    {
+        // Tạo mới vai trò
+        Role::create([
+            'name' => $request->input('name'),
+            'isDelete' => $request->input('isDelete', 0), 
+            'createdAt' => $request->input('createdAt', now()), 
+            'updatedAt' => $request->input('updatedAt', now()), 
+        ]);
+    
+        // Trả về thông báo thành công
+        return response()->json(['message' => 'Role created successfully'], 201);
+    }
+
+    public function deleteRole(Request $request)
+    {
+        $role = Role::find($request->id);
+
+        if (!$role) {
+            return response()->json(['message' => 'Vai trò không tồn tại.'], 404);
+        }
+
+        // Đánh dấu vai trò là đã xóa (hoặc xóa hoàn toàn tùy theo yêu cầu)
+        $role->isDelete = 1;
+        $role->save();
+
+        return response()->json(['message' => 'Vai trò đã được xóa thành công.'], 200);
+    }
+
+    
 
     
 

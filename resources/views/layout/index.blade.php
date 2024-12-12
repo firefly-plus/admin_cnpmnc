@@ -3,7 +3,7 @@
 @endphp --}}
 @php
     $permissions = session('employee_permissions', collect())->toArray(); 
-    dd($permissions);
+    // dd($permissions);
 @endphp
 
 <!DOCTYPE html>

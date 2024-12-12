@@ -14,6 +14,7 @@ class Product extends Model
     public $incrementing = false;
     // Các thuộc tính có thể gán
     protected $fillable = [
+        'id',
         'ID_SupCategory',
         'productName',
         'description',
