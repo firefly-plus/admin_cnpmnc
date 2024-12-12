@@ -9,6 +9,12 @@ class SupCategory extends Model
 {
     use HasFactory;
     protected $table = 'supcategory';
+    public $timestamps = false;
+    const CREATED_AT = 'createdAt';
+    const UPDATED_AT = 'updatedAt';
+    protected $casts = [
+        'id' => 'string',  // Ép kiểu id thành chuỗi
+    ];
 
     // Các thuộc tính có thể gán
     protected $fillable = [
@@ -25,7 +31,7 @@ class SupCategory extends Model
         return $this->belongsTo(Category::class, 'categoryId');
     }
 
-   
+
 
     // Relationship with Product
     public function products()

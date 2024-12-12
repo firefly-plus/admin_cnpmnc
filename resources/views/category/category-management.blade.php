@@ -77,40 +77,42 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="categoryDetailModalLabel">Category Details</h5>
-                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <h4>Subcategories</h4>
-                        <ul id="supCategoryList"></ul>
+                        <!-- Hiển thị chi tiết Category -->
+                        <h4 id="categoryName"></h4>
+                        <p id="categoryCreatedAt"></p>
+
+                        <!-- Form thêm SupCategory -->
                         <form id="addSupCategoryForm">
                             <div class="form-group">
-                                <label for="supCategoryName">Subcategory Name:</label>
-                                <input type="text" class="form-control" id="supCategoryName" name="supCategoryName"
+                                <label for="supCategoryName">Tên Danh Mục Con:</label>
+                                <input type="text" class="form-control" id="supCategoryName" name="SupCategoryName"
                                     required>
                             </div>
-                            <button type="submit" class="btn btn-primary">Add Subcategory</button>
+                            <button type="submit" class="btn btn-primary">Thêm Danh Mục Con</button>
                         </form>
+
+
                         <div class="table-container">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>Mã danh mục con</th>
                                         <th>Tên danh mục con</th>
-                                        <th>Mã danh mục</th>
                                         <th>Ngày tạo</th>
                                         <th></th>
                                     </tr>
                                 </thead>
-                                <tbody id="subcategoryTableBody">
-                                </tbody>
+                                <tbody id="subcategoryTableBody"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 @endsection
 
@@ -170,105 +172,112 @@
 
 
         // View Category Details
-        // View Category Details
         const viewCategoryDetails = (id) => {
-            // Store the current category ID for later use
-            currentCategoryId = id;
+            currentCategoryId = id; // Lưu lại ID của category hiện tại
 
-            // Fetch the category details
+            // Fetch thông tin chi tiết category và subcategories
             fetch(`/category/${id}`)
-                .then((response) => response.json())
+                .then(response => response.json())
                 .then((categoryData) => {
-                    // Show the category name and other details
-                    const categoryName = categoryData.categoryName; // Assuming categoryName is directly available
-                    const createdAt = categoryData.createdAt; // Assuming createdAt is directly available
+                    // Hiển thị thông tin category
+                    const categoryName = categoryData.categoryName;
+                    const createdAt = new Date(categoryData.createdAt).toLocaleString(); // Định dạng ngày tháng
+                    document.getElementById('categoryName').textContent = categoryName;
+                    document.getElementById('categoryCreatedAt').textContent = `Created At: ${createdAt}`;
 
-                    // Populate the modal with category details
-                    const categoryDetailModal = document.getElementById("categoryDetailModal");
-                    const modalTitle = categoryDetailModal.querySelector("#categoryDetailModalLabel");
-                    const modalBody = categoryDetailModal.querySelector(".modal-body");
 
-                    modalTitle.textContent = categoryName;
+                    // Hiển thị bảng subcategories
+                    const subcategoryTableBody = document.getElementById('subcategoryTableBody');
+                    subcategoryTableBody.innerHTML = ''; // Xóa các dòng cũ
 
-                    // Add the category details
-                    modalBody.innerHTML = `
-                <p>Created At: ${createdAt}</p>
-                <h5>Subcategories:</h5>
-                <ul id="supCategoryList"></ul>
-                <form id="addSupCategoryForm">
-                    <div class="form-group">
-                        <label for="supCategoryName">Subcategory Name:</label>
-                        <input type="text" class="form-control" id="supCategoryName" name="supCategoryName" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Add Subcategory</button>
-                </form>
-            `;
-
-                    // Fetch the subcategories for the current category
-                    fetch(
-                        `/categories/${id}/subcategories`) // Assuming there's an endpoint for fetching subcategories by category ID
-                        .then((response) => response.json())
-                        .then((subcategories) => {
-                            // Populate the subcategories list
-                            const supCategoryList = document.getElementById("supCategoryList");
-                            supCategoryList.innerHTML = ''; // Clear the list before adding new items
-
-                            subcategories.forEach(subcategory => {
-                                const listItem = document.createElement("li");
-                                listItem.innerHTML = `
-                            ${subcategory.SupCategoryName}
-                            <button class="btn btn-sm btn-warning" onclick="editSupCategory(${subcategory.id})">Edit</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteSupCategory(${subcategory.id})">Delete</button>
-                        `;
-                                supCategoryList.appendChild(listItem);
-                            });
-                        })
-                        .catch((error) => {
-                            console.error("Error fetching subcategories:", error);
+                    if (Array.isArray(categoryData.sub_categories)) {
+                        categoryData.sub_categories.forEach(subcategory => {
+                            subcategoryTableBody.innerHTML += `
+                                <tr>
+                                    <td>${subcategory.id}</td>  <!-- ID sẽ là chuỗi -->
+                                    <td>${subcategory.SupCategoryName}</td>
+                                    <td>${new Date(subcategory.createdAt).toLocaleString()}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning" onclick="editSupCategory('${categoryData.id}', '${subcategory.id}')">Edit</button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteSupCategory('${categoryData.id}', '${subcategory.id}')">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
                         });
 
-                    // Open the modal
-                    const modal = new bootstrap.Modal(categoryDetailModal);
+                    } else {
+                        subcategoryTableBody.innerHTML = '<tr><td colspan="4">No subcategories found.</td></tr>';
+                    }
+
+                    // Mở modal
+                    const modal = new bootstrap.Modal(document.getElementById('categoryDetailModal'));
                     modal.show();
                 })
-                .catch((error) => {
-                    console.error("Error fetching category details:", error);
+                .catch(error => {
+                    console.error('Error fetching category details:', error);
                 });
+
         };
 
         // Add SupCategory
         document.getElementById('addSupCategoryForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // Ngăn việc gửi form mặc định
+
             const supCategoryName = document.getElementById('supCategoryName').value;
+            const categoryId = currentCategoryId; // categoryId đã được lưu trong context
 
-            if (!supCategoryName) {
-                alert('Subcategory name is required!');
-                return;
-            }
+            const formData = {
+                SupCategoryName: supCategoryName
+            };
 
-            fetch(`/categories/${currentCategoryId}/supcategory`, {
+            console.log('formdata', formData); // Kiểm tra dữ liệu gửi đi
+
+            fetch(`/category/${categoryId}/supcategory`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        name: supCategoryName
-                    })
+                    body: JSON.stringify(formData),
                 })
-                .then(response => response.json())
+                .then(response => {
+                    // Kiểm tra trạng thái HTTP
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`); // Nếu không thành công, ném lỗi
+                    }
+                    return response.json(); // Chuyển đổi phản hồi thành JSON
+                })
                 .then(data => {
+                    // Kiểm tra dữ liệu trả về từ server
+                    console.log('Response data:', data);
+
+
                     alert(data.message);
-                    viewCategoryDetails(currentCategoryId); // Refresh details
+                    viewCategoryDetails(currentCategoryId);
+                    // Đóng modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('categoryDetailModal'));
+                    modal.hide(); // Đảm bảo modal được đóng
+
+                    // Xóa lớp overlay nếu có
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) {
+                        backdrop.remove();
+                    }
                 })
-                .catch(error => alert("Error adding subcategory: " + error));
+                .catch(error => {
+                    // Xử lý lỗi
+                    console.error('Error:', error);
+                    alert('Error adding subcategory: ' + error.message); // Thông báo lỗi
+                });
         });
+
 
         // Edit Category
         function editCategory(id) {
-            const newCategoryName = prompt("Enter new category name:");
+            const newCategoryName = prompt("Nhập tên mới cho danh mục:");
             if (!newCategoryName) return;
 
-            fetch(`/categories/${id}`, {
+            fetch(`/category/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -287,55 +296,83 @@
 
         // Delete Category
         function deleteCategory(id) {
-            if (confirm("Are you sure you want to delete this category?")) {
-                fetch(`/categories/${id}`, {
-                        method: 'DELETE'
+            if (confirm("Có chắc muốn xóa danh mục này?")) {
+                fetch(`/category/${id}`, {
+                        method: 'DELETE',
                     })
                     .then(response => response.json())
                     .then(data => {
                         alert(data.message);
                         loadCategories();
                     })
-                    .catch(error => alert("Error deleting category: " + error));
+                    .catch(error => alert("Lỗi khi xóa danh mục: " + error));
             }
         }
 
         // Delete SupCategory
-        function deleteSupCategory(id) {
-            if (confirm("Are you sure you want to delete this subcategory?")) {
-                fetch(`/categories/${currentCategoryId}/supcategory/${id}`, {
-                        method: 'DELETE'
+        function deleteSupCategory(categoryId, supCategoryId) {
+            if (confirm("Bạn có chắc chắn muốn xóa danh mục con này?")) {
+                console.log('id category:', categoryId);
+                console.log('id subcategory:', supCategoryId);
+
+                // Gọi API với ID là chuỗi
+                fetch(`/category/${categoryId}/supcategory/${supCategoryId}`, {
+                        method: 'DELETE',
                     })
                     .then(response => response.json())
                     .then(data => {
                         alert(data.message);
-                        viewCategoryDetails(currentCategoryId); // Refresh details
+                        viewCategoryDetails(categoryId);
+                        // Đóng modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('categoryDetailModal'));
+                        modal.hide(); // Đảm bảo modal được đóng
+
+                        // Xóa lớp overlay nếu có
+                        const backdrop = document.querySelector('.modal-backdrop');
+                        if (backdrop) {
+                            backdrop.remove();
+                        }
                     })
                     .catch(error => alert("Error deleting subcategory: " + error));
             }
         }
 
-        // Edit SupCategory
-        function editSupCategory(id) {
-            const newName = prompt("Enter new name for the subcategory:");
-            if (!newName) return;
 
-            fetch(`/categories/${currentCategoryId}/supcategory/${id}`, {
+
+        // Edit SupCategory
+        function editSupCategory(categoryId, supCategoryId) {
+            const newSupCategoryName = prompt("Nhập tên mới cho danh mục con:");
+            if (!newSupCategoryName) return;
+
+            // Gọi API với ID là chuỗi
+            fetch(`/category/${categoryId}/supcategory/${supCategoryId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        name: newName
+                        SupCategoryName: newSupCategoryName
                     })
                 })
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
-                    viewCategoryDetails(currentCategoryId); // Refresh details
+                    viewCategoryDetails(categoryId);
+                     // Đóng modal
+                     const modal = bootstrap.Modal.getInstance(document.getElementById('categoryDetailModal'));
+                    modal.hide(); // Đảm bảo modal được đóng
+
+                    // Xóa lớp overlay nếu có
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) {
+                        backdrop.remove();
+                    }
                 })
-                .catch(error => alert("Error editing subcategory: " + error));
+                .catch(error => alert("Error updating subcategory: " + error));
         }
+
+
+
 
         // Initial load
         loadCategories();

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\SupCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
 
 class CategoryController extends Controller
 {
@@ -29,111 +31,143 @@ class CategoryController extends Controller
             return response()->json(['message' => 'Category not found'], 404);
         }
 
-        return response()->json($category); 
-    }
-    public function getCategoryById($id)
-    {
-        $category = Category::with('supCategories')->findOrFail($id);
         return response()->json($category);
     }
+    // public function getCategoryById($id)
+    // {
+    //     $category = Category::with('supCategories')->findOrFail($id);
+    //     return response()->json($category);
+    // }
 
     public function getSubcategoriesByCategoryId($categoryId)
     {
-        $subCategories = Category::findOrFail($categoryId)->subCategories;
-        return response()->json($subCategories);
+        $category = Category::with('subCategories')->findOrFail($categoryId);
+
+        $subCategories = $category->subCategories->map(function ($subCategory) {
+            return [
+                'id' => (string) $subCategory->id,
+                'SupCategoryName' => $subCategory->SupCategoryName,
+                'categoryId' => $subCategory->categoryId,
+                'isDelete' => $subCategory->isDelete,
+                'createdAt' => $subCategory->createdAt,
+                'updatedAt' => $subCategory->updatedAt
+            ];
+        });
+
+        return response()->json([
+            'id' => $category->id,
+            'categoryName' => $category->categoryName,
+            'isDelete' => $category->isDelete,
+            'createdAt' => $category->createdAt,
+            'updatedAt' => $category->updatedAt,
+            'sub_categories' => $subCategories
+        ]);
     }
 
 
-    // public function addCategory(Request $request)
-    // {
-    //     $request->validate([
-    //         'categoryName' => 'required|string|max:255',
-    //         'isDelete' => 'boolean',
-    //     ]);
-
-    //     $category = new Category();
-    //     $category->categoryName = $request->categoryName;
-    //     $category->isDelete = $request->isDelete ?? 0;
-    //     $category->save();
-
-    //     return response()->json(['message' => 'Category added successfully!'], 201);
-    // }
-    
     public function addCategory(Request $request)
     {
         $category = new Category();
-        $category->categoryName = $request->categoryName;  
+        $category->categoryName = $request->categoryName;
         $category->isDelete = 0;
-        $category->createdAt = now();  // Đặt giá trị cho createdAt
-        $category->updatedAt = now();  // Đặt giá trị cho updatedAt
+        $category->createdAt = now();
+        $category->updatedAt = now();
         $category->save();
-        
+
         return response()->json(['message' => 'Category đã được thêm thành công!'], 201);
     }
 
-    
-
     public function editCategory(Request $request, $id)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::find($id);
+        if (!$category) {
+            return response()->json(['message' => 'Category not found'], 404);
+        }
 
+        // Validate input
         $request->validate([
-            'categoryName' => 'string|max:255',
-            'isDelete' => 'boolean',
+            'categoryName' => 'required|string|max:255',
         ]);
 
-        $category->categoryName = $request->categoryName ?? $category->categoryName;
-        $category->isDelete = $request->has('isDelete') ? $request->isDelete : $category->isDelete;
+        // Update category
+        $category->categoryName = $request->categoryName;
         $category->save();
 
-        return response()->json(['message' => 'Category updated successfully!'], 200);
+        return response()->json(['message' => 'Đã cập nhật danh mục thành công']);
     }
 
     public function deleteCategory($id)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::find($id);
+        if (!$category) {
+            return response()->json(['message' => 'Không tìm thấy'], 404);
+        }
+
+        // Xóa danh mục
         $category->delete();
 
-        return response()->json(['message' => 'Category deleted successfully!'], 200);
+        return response()->json(['message' => 'Xóa danh mục thành công']);
     }
 
-    
-   
     public function addSupCategory(Request $request, $categoryId)
     {
-        $category = Category::findOrFail($categoryId);
-
-        $request->validate([
-            'name' => 'required|string|max:255',
+        // Validate dữ liệu từ người dùng
+        $validatedData = $request->validate([
+            'SupCategoryName' => 'required|string|max:255',
         ]);
+        $SupCategoryName = $validatedData['SupCategoryName'];
+        $categoryCode = $categoryId;
+        $namePrefix = strtoupper(substr($SupCategoryName, 0, 3));
+        $randomSuffix = Str::upper(Str::random(5));
+        $subCategoryCode = $categoryCode . $namePrefix . $randomSuffix;
+        $subCategory = new SupCategory();
+        $subCategory->id = $subCategoryCode;
+        $subCategory->SupCategoryName = $SupCategoryName;
+        $subCategory->categoryId = $categoryId;
+        $subCategory->isDelete = 0;
+        $subCategory->createdAt = now();
+        $subCategory->updatedAt = now();
+        $subCategory->save();
 
-        $supCategory = new SupCategory();
-        $supCategory->category_id = $categoryId;
-        $supCategory->name = $request->name;
-        $supCategory->save();
-
-        return response()->json(['message' => 'SupCategory added successfully!'], 201);
+        // Trả về kết quả
+        return response()->json([
+            'message' => 'Thêm danh mục con thành công',
+            'subcategory' => [
+                'id' => $subCategoryCode,
+                'SupCategoryName' => $SupCategoryName,
+                'categoryId' => $categoryId,
+                'subCategoryCode' => $subCategoryCode,
+            ]
+        ]);
     }
+
     public function editSupCategory(Request $request, $categoryId, $supCategoryId)
     {
         $category = Category::findOrFail($categoryId);
         $supCategory = SupCategory::findOrFail($supCategoryId);
 
         $request->validate([
-            'name' => 'string|max:255',
+            'SupCategoryName' => 'required|string|max:255',
         ]);
 
-        $supCategory->name = $request->name ?? $supCategory->name;
+        $supCategory->SupCategoryName = $request->SupCategoryName;
+        $supCategory->updatedAt = now();
+
         $supCategory->save();
 
-        return response()->json(['message' => 'SupCategory updated successfully!'], 200);
+        return response()->json([
+            'message' => 'Cập nhật danh mục con thành công!',
+            'subcategory' => $supCategory
+        ]);
     }
+
     public function deleteSupCategory($categoryId, $supCategoryId)
     {
         $category = Category::findOrFail($categoryId);
         $supCategory = SupCategory::findOrFail($supCategoryId);
+
         $supCategory->delete();
 
-        return response()->json(['message' => 'SupCategory deleted successfully!'], 200);
+        return response()->json(['message' => 'Danh mục con đã được xóa thành công!'], 200);
     }
 }
