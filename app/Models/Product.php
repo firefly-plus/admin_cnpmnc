@@ -10,11 +10,12 @@ class Product extends Model
     use HasFactory;
     protected $table = 'product';
     protected $primaryKey='id';
+   
     // Các thuộc tính có thể gán
     protected $keyType = 'string';
     public $incrementing = false;
     protected $fillable = [
-     
+        'id',
         'ID_SupCategory',
         'productName',
         'description',

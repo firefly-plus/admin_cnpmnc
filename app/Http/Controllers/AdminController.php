@@ -7,8 +7,11 @@ use App\Models\Discount;
 use App\Models\Employee;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
+use App\Models\Permission;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Models\Role;
+use App\Models\RolePermission;
 use App\Models\SupCategory;
 use App\Models\User;
 use App\Models\VariationDiscount;
@@ -19,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 function removeAccents($str) {
@@ -37,7 +41,7 @@ function removeAccents($str) {
     $str = trim($str);
 
     return $str;
-} 
+}
 
 class AdminController extends Controller
 {
@@ -47,35 +51,33 @@ class AdminController extends Controller
         return view('sign-in');
     }
 
-    public function showProductManagement() 
+    public function showProductManagement()
     {
         return view('product.product-management');
     }
-        
+
 
     public function login(Request $request)
     {
-        $request->validate([
-            'Phone' => 'required|digits:10',
-            'Password' => 'required|string|min:1',
-        ]);
-        $employee = Employee::where('Phone', $request->Phone)->first();
+        $credentials = $request->only('Phone', 'Password');
 
-        if ($request->has('rememberMe') && $request->rememberMe == 'on') {
-            Cookie::queue('employee_id', $employee->id, 60 * 24 * 30); 
-            Cookie::queue('employee_name', $employee->FullName, 60 * 24 * 30);
+        $employee = Employee::where('Phone', $credentials['Phone'])->first();
+        // $employee->Passwords = bcrypt('123');
+        // $employee->save();
+
+        if ($employee && Hash::check($credentials['Password'], $employee->Passwords)) {
+            Auth::guard('employee')->login($employee);
+            return redirect()->intended('/statistics.html');
         }
-        if ($employee && Hash::check($request->Password, $employee->Passwords)) 
-        {
-            session(['employee_id' => $employee->id]); 
-            session(['employee_name' => $employee->FullName]); 
-            return redirect()->to('/statistics.html');
-        } else {
-            return back()->withErrors(['error' => 'Thông tin đăng nhập không chính xác.']);  
-        }
+
+
+        return back()->withErrors([
+            'Phone' => 'Thông tin đăng nhập không chính xác.',
+        ]);
     }
 
-    public function showInvoice() 
+
+    public function showInvoice()
     {
         return view('invoice.invoice-management');
     }
@@ -85,7 +87,7 @@ class AdminController extends Controller
         $filteredInvoices = [];
         if ($request->orderStatus) {
             $invoices = Invoice::all();
-            $orderStatusWithoutAccents = removeAccents($request->orderStatus);  
+            $orderStatusWithoutAccents = removeAccents($request->orderStatus);
             foreach ($invoices as $invoice) {
                 $orderStatusFromDB = removeAccents($invoice->orderStatus);
                 if (stripos($orderStatusFromDB, $orderStatusWithoutAccents) !== false) {
@@ -97,7 +99,7 @@ class AdminController extends Controller
         }
         return response()->json($filteredInvoices);
     }
-    
+
     public function updateOrderStatus(Request $request)
     {
         if ($request->invoice_id && $request->orderStatus) {
@@ -116,14 +118,14 @@ class AdminController extends Controller
 
     public function exportPdf(Request $request)
     {
-        try 
+        try
         {
-            $selectedInvoices = $request->input('invoices'); 
-    
+            $selectedInvoices = $request->input('invoices');
+
             if (is_string($selectedInvoices)) {
                 $selectedInvoices = explode(',', $selectedInvoices);
             }
-        
+
             if (empty($selectedInvoices)) {
                 return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một hóa đơn!');
             }
@@ -131,15 +133,15 @@ class AdminController extends Controller
             $invoices = Invoice::with('invoiceDetails.productVariation.product')
                                 ->whereIn('invoice_id', $selectedInvoices)
                                 ->get();
-            
+
             Log::debug('Retrieved invoices: ', $invoices->toArray());
-            
-           
+
+
             $pdfPath = public_path('pdf/hoadon.pdf');
             $pdf = Pdf::loadView('invoice.pdf', compact('invoices'));
             $pdf->save($pdfPath);
-        
-            
+
+
             return response()->json(['pdfPath' => asset('pdf/hoadon.pdf')], 200);
         } catch (\Exception $e) {
             Log::error('Lỗi xuất PDF: ' . $e->getMessage());
@@ -191,9 +193,9 @@ class AdminController extends Controller
 
         $sum_iv_today = 0;
         foreach ($invoicesDay as $invoice) {
-            
+
                 $sum_iv_today += 1;
-            
+
         }
         Log::info('Total ticket seats sold today: ', ['sum_iv_today' => $sum_iv_today]);
 
@@ -217,9 +219,9 @@ class AdminController extends Controller
 
                                 if ($proDuct_Va->id == $Invoices_De->ID_productVariation) {
                                     Log::info('Invoice Detail:', ['product_variation_id' => $proDuct_Va->id, 'amount' => $Invoices_De->Amount]);
-                                    
+
                                     if ($Invoices_De->invoice->orderStatus == 'Đã hoàn thành') {
-                                        
+
                                         $sumByCate += $Invoices_De->Amount;
                                     }
                                 }
@@ -233,42 +235,42 @@ class AdminController extends Controller
                 'category' => $subCate->SupCategoryName,
                 'revenue' => $sumByCate,
             ];
-        
+
 
             Log::info('Total revenue for subcategory: ', ['sumByCate' => $sumByCate]);
         }
-        
+
         $revenueByProduct = [];
 
         foreach ($proDuct_Vas as $product) {
             $sumByPro = 0;
-            
+
             Log::info('Processing product variation:', ['product' => $product->productName]);
-        
+
             foreach($Invoices_Des as $Invoices_De) {
-            
+
                 Log::info('Checking invoice detail:', [
                     'product_variation_id' => $product->id,
                     'invoice_detail_product_variation_id' => $Invoices_De->ID_productVariation,
                     'invoice_status' => $Invoices_De->invoice->orderStatus,
                 ]);
-        
+
                 if($product->id == $Invoices_De->ID_productVariation) {
                     if ($Invoices_De->invoice->orderStatus == 'Đã hoàn thành') {
                         $sumByPro += $Invoices_De->Amount;
                     }
                 }
             }
-        
+
             $revenueByProduct[] = [
-                'product' => $product->product->productName.' Size: '.$product->size, 
-                'revenue' => $sumByPro,  
+                'product' => $product->product->productName.' Size: '.$product->size,
+                'revenue' => $sumByPro,
             ];
-        
+
             Log::info('Revenue for product:', ['product' => $product->productName, 'revenue' => $sumByPro]);
         }
         $revenueByCategory = collect($revenueByCategory); //
-        $revenueByProduct = collect($revenueByProduct);   
+        $revenueByProduct = collect($revenueByProduct);
         return view('statistics.index', compact(
             'userCount',
             'sum_today',
@@ -276,23 +278,23 @@ class AdminController extends Controller
             'sum_iv_today',
             'now',
             'year',
-            'revenueByCategory', 
-            'revenueByProduct' 
+            'revenueByCategory',
+            'revenueByProduct'
         ));
     }
 
     public function getRevenueData(Request $request)
     {
         $statistical = $request->statistical;
-        
+
         $start_time = $request->start_time ? Carbon::parse($request->start_time) : Carbon::now();
         $end_time = $request->end_time ? Carbon::parse($request->end_time) : Carbon::now();
-    
+
         if ($statistical == 'week') {
-            $start_time = Carbon::now()->startOfWeek(); 
-            $end_time = Carbon::now()->endOfWeek(); 
+            $start_time = Carbon::now()->startOfWeek();
+            $end_time = Carbon::now()->endOfWeek();
         } elseif ($statistical == 'last_week') {
-           
+
             $start_time = Carbon::now()->subWeek()->startOfWeek();
             $end_time = Carbon::now()->subWeek()->endOfWeek();
         } elseif ($statistical == 'this_month') {
@@ -300,43 +302,43 @@ class AdminController extends Controller
             $start_time = Carbon::now()->startOfMonth();
             $end_time = Carbon::now()->endOfMonth();
         } elseif ($statistical == 'last_month') {
-          
+
             $start_time = Carbon::now()->subMonth()->startOfMonth();
             $end_time = Carbon::now()->subMonth()->endOfMonth();
         } elseif ($statistical == 'year') {
-            
+
             $start_time = Carbon::now()->startOfYear();
             $end_time = Carbon::now()->endOfYear();
         } elseif ($statistical == 'last_year') {
-           
+
             $start_time = Carbon::now()->subYear()->startOfYear();
             $end_time = Carbon::now()->subYear()->endOfYear();
         } elseif ($statistical == 'all_time') {
-           
-            $start_time = Carbon::createFromDate(2000, 1, 1); 
-            $end_time = Carbon::now(); 
+
+            $start_time = Carbon::createFromDate(2000, 1, 1);
+            $end_time = Carbon::now();
         }
-    
-      
+
+
         $revenue_per_day = Invoice::whereBetween('createdAt', [$start_time, $end_time])
                                   ->where('orderStatus', 'Đã hoàn thành')
                                   ->selectRaw('DATE(createdAt) as date, SUM(totalAmount) as revenue')
                                   ->groupBy('date')
                                   ->orderBy('date')
                                   ->get();
-    
-       
+
+
         $labels = $revenue_per_day->pluck('date');
         $revenues = $revenue_per_day->pluck('revenue');
-        
-      
+
+
         return response()->json([
             'labels' => $labels,
             'revenues' => $revenues,
         ]);
     }
-    
-    
+
+
     //Promotion
     public function showPromotion()
     {
@@ -357,24 +359,24 @@ class AdminController extends Controller
             })
             ->get();
         $discounts = VariationDiscount::all();
-    
+
         $filteredProductVariations = [];
         foreach ($productVariations as $productVariation) {
             $hasDiscount = false;
             foreach ($discounts as $discount) {
                 if ($discount->ID_ProductVariation == $productVariation->id) {
                     $hasDiscount = true;
-                    break; 
+                    break;
                 }
             }
             if (!$hasDiscount) {
                 $filteredProductVariations[] = $productVariation;
             }
         }
-    
+
         return response()->json($filteredProductVariations);
     }
-    
+
     public function getProductVariationBySubCate(Request $request)
     {
         $productVariations = ProductVariation::with('product', 'product.productImages')
@@ -389,23 +391,23 @@ class AdminController extends Controller
             foreach ($discounts as $discount) {
                 if ($discount->ID_ProductVariation == $productVariation->id) {
                     $hasDiscount = true;
-                    break; 
+                    break;
                 }
             }
             if (!$hasDiscount) {
                 $filteredProductVariations[] = $productVariation;
             }
         }
-    
+
         return response()->json($filteredProductVariations);
     }
-    
+
     public function getProductVariationByProduct(Request $request)
     {
         $productVariations = ProductVariation::with('product', 'product.productImages')
             ->where('ID_Product', $request->id)
             ->get();
-    
+
         $discounts = VariationDiscount::all();
         $filteredProductVariations = [];
         foreach ($productVariations as $productVariation) {
@@ -413,17 +415,17 @@ class AdminController extends Controller
             foreach ($discounts as $discount) {
                 if ($discount->ID_ProductVariation == $productVariation->id) {
                     $hasDiscount = true;
-                    break; 
+                    break;
                 }
             }
             if (!$hasDiscount) {
                 $filteredProductVariations[] = $productVariation;
             }
         }
-    
+
         return response()->json($filteredProductVariations);
     }
-    
+
 
     public function getCategory()
     {
@@ -452,7 +454,7 @@ class AdminController extends Controller
             foreach ($variationDiscounts as $variationDiscount) {
                 if ($variationDiscount->ID_Variation == $productVariation->id) {
                     $filteredProductVariations[] = $productVariation;
-                    break; 
+                    break;
                 }
             }
         }
@@ -511,8 +513,8 @@ class AdminController extends Controller
 
     public function getUserById(Request $request)
     {
-        $user = User::find($request->id);       
-        return response()->json($user);     
+        $user = User::find($request->id);
+        return response()->json($user);
     }
 
     public function getInvoiceByUser(Request $request)
@@ -544,7 +546,7 @@ class AdminController extends Controller
     {
         return view('voucher.voucher-management');
     }
-    
+
     public function getVoucher()
     {
         $vouchers=Voucher::all();
@@ -556,16 +558,68 @@ class AdminController extends Controller
     {
         return view('warehouse.warehouse-management');
     }
-    
+
+    //quản lý quyền
+    public function showPermission()
+    {
+        return view('permission.permission-management');
+    }
+
+    public function getRole()
+    {
+        $role=Role::all();
+        return response()->json($role);
+    }
+
+    public function getPermission(Request $request)
+    {
+        $name = $request->input('name', '');
+        $permissions = Permission::where('name', 'like', "%$name%")->get();
+        return response()->json($permissions);
+    }
+
+    public function getRolePermission(Request $request)
+    {
+        $rolepermission=RolePermission::where('role_id',$request->role_id)->get();
+        $rolepermission=$rolepermission->pluck('permission_id');
+        return response()->json($rolepermission);
+    }
+
+    public function updateRolePermission(Request $request)
+    {
+        $role_id = $request->role_id;
+        $ds_role_permission = $request->ds_role_permission;
+        $role_permissions = RolePermission::where('role_id', $role_id)->pluck('permission_id')->toArray();
+        $permissions_to_add = array_diff($ds_role_permission, $role_permissions);
+        $permissions_to_remove = array_diff($role_permissions, $ds_role_permission);
+        foreach ($permissions_to_add as $permission_id) {
+            RolePermission::create([
+                'role_id' => $role_id,
+                'permission_id' => $permission_id,
+            ]);
+        }
+        RolePermission::where('role_id', $role_id)
+            ->whereIn('permission_id', $permissions_to_remove)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Cập nhật quyền thành công',
+            'added_permissions' => $permissions_to_add,
+            'removed_permissions' => $permissions_to_remove,
+        ], 200);
+    }
 
 
 
 
 
 
-    
 
-    
- 
-    
+
+
+
+
+
+
+
 }

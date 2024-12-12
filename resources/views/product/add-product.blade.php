@@ -56,6 +56,7 @@
 
      
         <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
+        <button type="button" class="btn btn-primary"> <a href="/danhsachsanpham">Quay lại</a></button>
     </form>
 </div>
 
@@ -89,6 +90,17 @@
             // Di chuyển con trỏ vào ô đầu tiên của dòng mới để người dùng tiếp tục nhập
             newRow.querySelector('input').focus();
         }
+    });
+
+     // Kiểm tra thông báo thành công được gửi từ server
+     document.addEventListener('DOMContentLoaded', function () {
+        @if (session('success'))
+            // Hiển thị thông báo cho người dùng
+            alert("{{ session('success') }}");
+            
+            // Chuyển hướng hoặc tải lại danh sách sản phẩm
+            window.location.href = "{{ route('danhSachSanPham') }}"; // Thay 'products.index' bằng route của danh sách sản phẩm
+        @endif
     });
 </script>
 

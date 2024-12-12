@@ -9,9 +9,14 @@ class SupCategory extends Model
 {
     use HasFactory;
     protected $table = 'supcategory';
+    protected $primaryKey='id';
 
     // Các thuộc tính có thể gán
+    protected $keyType = 'string';
+    public $incrementing = false;
+    // Các thuộc tính có thể gán
     protected $fillable = [
+        'id',
         'SupCategoryName',
         'categoryId',
         'isDelete',
@@ -25,7 +30,7 @@ class SupCategory extends Model
         return $this->belongsTo(Category::class, 'categoryId');
     }
 
-   
+
 
     // Relationship with Product
     public function products()

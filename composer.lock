@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "65b78c1253c7d7c83be863e70abe5e62",
+    "content-hash": "d1ef13ba64330697859773d9045f37dd",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -241,12 +241,12 @@
             "type": "library",
             "extra": {
                 "laravel": {
-                    "providers": [
-                        "CloudinaryLabs\\CloudinaryLaravel\\CloudinaryServiceProvider"
-                    ],
                     "aliases": {
                         "Cloudinary": "CloudinaryLabs\\CloudinaryLaravel\\Facades\\Cloudinary"
-                    }
+                    },
+                    "providers": [
+                        "CloudinaryLabs\\CloudinaryLaravel\\CloudinaryServiceProvider"
+                    ]
                 }
             },
             "autoload": {

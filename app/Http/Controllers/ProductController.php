@@ -30,13 +30,14 @@ class ProductController extends Controller
 
         return view('product.add-product', compact('Subcategories'));
     }
-    
+
     public function themSanPham(Request $request)
     {
         try {
             Log::info('Request data:', $request->all());
             // Tạo sản phẩm mới
             $chuoi=Str::random(5);
+            Log::info('Sản phẩm được tạo:'.$chuoi);
             $product = Product::create([
                 'id'             => $chuoi,
                 'ID_SupCategory' => $request->input('ID_SupCategory'),
@@ -47,14 +48,14 @@ class ProductController extends Controller
                 'updatedAt'      => now(),
             ]);
             Log::info('Sản phẩm được tạo:', $product->toArray());
-            
+
             if ($request->has('productImage')) {
                 foreach ($request->file('productImage', []) as $image) {
                     if ($image->isValid()) {
                         $uploadedFileUrl = Cloudinary::upload($image->getRealPath(), [
                             'folder' => 'products'
                         ])->getSecurePath();
-            
+
                         $productImage = ProductImage::create([
                             'ProductID' =>  $chuoi,
                             'IMG_URL'   => $uploadedFileUrl,
@@ -80,10 +81,10 @@ class ProductController extends Controller
                     'price' => $prices[$index] ?? null,
                     'stock' => $stocks[$index] ?? null,
                 ]);
-            
+
                 $productVariation =ProductVariation::create([
                     'id'         => Str::random(5),
-                    'ID_Product'  =>  $chuoi, 
+                    'ID_Product'  =>  $chuoi,
                     'size'       => $size,
                     'Price'      => $prices[$index],
                     'stock'      => $stocks[$index],
@@ -97,12 +98,18 @@ class ProductController extends Controller
 
 
             return redirect()->back()->with('success', 'Sản phẩm được thêm thành công.');
+            // return response()->json([
+            //     'success' => true,
+            //     'message' => 'Sản phẩm đã được thêm thành công!',
+            //     'redirect_url' => route('danhSachSanPham'), // Gọi đúng tên route đã được gán
+            // ], 200);
+
         } catch (\Exception $e) {
-            
-            
+
+
             return redirect()->back()->withErrors('Có lỗi xảy ra: ' . $e->getMessage());
         }
-        
+
     }
 
     public function suaSanPham(Request $request)
@@ -128,7 +135,7 @@ class ProductController extends Controller
                     cloudinary()->destroy($oldImage->IMG_URL);
                     $oldImage->delete();
                 }
-    
+
                 // Thêm ảnh mới
                 foreach ($request->file('productImages') as $image) {
                     $uploadedFile = Cloudinary::upload($image->getRealPath(), ['folder' => 'products']);
@@ -138,7 +145,7 @@ class ProductController extends Controller
                     ]);
                 }
             }
-    
+
             // Xử lý các biến thể sản phẩm
             $existingVariations = $product->productVariations()->pluck('id')->toArray(); // Lấy danh sách ID biến thể cũ
             Log::info('Lấy danh sách biến thể hiện tại.', ['existing_variations' => $existingVariations]);
@@ -146,12 +153,12 @@ class ProductController extends Controller
             $newSizes = $newVariations['size'] ?? [];
             $newPrices = $newVariations['price'] ?? [];
             $newStocks = $newVariations['stock'] ?? [];
-    
+
             // Cập nhật hoặc thêm mới biến thể
             foreach ($newSizes as $index => $size) {
                 $price = $newPrices[$index] ?? 0;
                 $stock = $newStocks[$index] ?? 0;
-    
+
                 // Kiểm tra nếu biến thể đã tồn tại
                 if (isset($existingVariations[$index])) {
                     $variation = ProductVariation::findOrFail($existingVariations[$index]);
@@ -170,13 +177,13 @@ class ProductController extends Controller
                     ]);
                 }
             }
-    
+
             // // Xóa các biến thể không còn tồn tại trong form
             // $submittedVariationIds = array_slice(array_keys($newSizes), 0, count($newSizes));
             // ProductVariation::whereNotIn('id', $submittedVariationIds)
             //     ->where('ProductID', $product->id)
             //     ->delete();
-    
+
             // Phản hồi thành công
             return redirect()->back()->with('success', 'Cập nhật sản phẩm thành công!');
         } catch (\Exception $e) {
@@ -187,10 +194,10 @@ class ProductController extends Controller
             ], 500);
         }
     }
-    
-    
 
-    
+
+
+
 
 
     public function xoaSanPham($id)
@@ -209,21 +216,21 @@ class ProductController extends Controller
                 return redirect()->back()->with('success', 'Sản phẩm đã được ngưng bán.');
             }
 
-           
+
                 $product->productImages()->delete();
 
                 $product->productVariations()->delete();
-              
+
                 $product->delete();
                 // return response()->json([
                 //     'success' => true,
                 //     'message' => 'Sản phẩm đã được xóa thành công.',
                 // ]);
                 return redirect()->back()->with('success', 'Sản phẩm đã được xóa thành công.');
-            
-           
+
+
         // } catch (\Exception $e) {
-            
+
         //     Log::error('Lỗi khi xóa sản phẩm: ' . $e->getMessage());
 
         //     // return response()->json([

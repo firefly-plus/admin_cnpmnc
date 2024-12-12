@@ -15,7 +15,7 @@ class ProductVariation extends Model
     public $incrementing = false;
     // Các thuộc tính có thể gán
     protected $fillable = [
-       
+       'id',
         'ID_Product',
         'size',
         'Price',
@@ -33,7 +33,7 @@ class ProductVariation extends Model
 
     public function variationdiscount()
     {
-        return $this->hasMany(VariationDiscount::class, 'ID_Variation');  
+        return $this->hasMany(VariationDiscount::class, 'ID_Variation');
     }
-    
+
 }
