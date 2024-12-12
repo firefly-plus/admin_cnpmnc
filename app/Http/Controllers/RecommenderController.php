@@ -114,7 +114,7 @@ class RecommenderController extends Controller
                 $idString = implode(',', $recommendedProductsIds);
                 
                 // Gọi stored procedure
-                $pr = DB::select("call doan_chuyennganh1.GetProductsByIds(?)", [$idString]);
+                $pr = DB::select("call GetProductsByIds(?)", [$idString]);
            
             return response()->json($pr);
         } catch (\Exception $e) {
