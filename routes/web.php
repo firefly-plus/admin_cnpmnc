@@ -64,3 +64,34 @@ Route::get('/voucher-management.html', [App\Http\Controllers\AdminController::cl
 
 Route::get('/warehouse-management.html', [App\Http\Controllers\AdminController::class, 'showWareHouse']);
 
+
+Route::get('/category-management.html', [App\Http\Controllers\CategoryController::class, 'showCategoryPage']);
+Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index']);
+Route::post('/category', [App\Http\Controllers\CategoryController::class, 'addCategory']);
+Route::get('/category/{id}', [App\Http\Controllers\CategoryController::class, 'getSubcategoriesByCategoryId']);
+Route::put('/category/{id}', [App\Http\Controllers\CategoryController::class, 'editCategory']);
+Route::delete('/category/{id}', [App\Http\Controllers\CategoryController::class, 'deleteCategory']);
+Route::post('/category/{categoryId}/supcategory', [App\Http\Controllers\CategoryController::class, 'addSupCategory']);
+Route::put('/category/{categoryId}/supcategory/{supCategoryId}', [App\Http\Controllers\CategoryController::class, 'editSupCategory']);
+Route::delete('/category/{categoryId}/supcategory/{supCategoryId}', [App\Http\Controllers\CategoryController::class, 'deleteSupCategory']);
+
+
+Route::resource('suppliers', App\Http\Controllers\SupplierController::class);
+Route::get('/suppliers', [App\Http\Controllers\SupplierController::class, 'index'])->name('suppliers.index');
+// Đảm bảo route này tồn tại
+Route::get('/suppliers/create', [App\Http\Controllers\SupplierController::class, 'create'])->name('suppliers.create');
+
+Route::post('/suppliers', [App\Http\Controllers\SupplierController::class, 'store'])->name('suppliers.store');
+
+Route::get('/suppliers/{id}', [App\Http\Controllers\SupplierController::class, 'show'])->name('suppliers.show');
+
+Route::get('/suppliers/{id}/edit', [App\Http\Controllers\SupplierController::class, 'edit'])->name('suppliers.edit');
+
+Route::put('/suppliers/{id}', [App\Http\Controllers\SupplierController::class, 'update'])->name('suppliers.update');
+Route::patch('/suppliers/{id}', [App\Http\Controllers\SupplierController::class, 'update']);
+Route::delete('suppliers/{id}', [App\Http\Controllers\SupplierController::class, 'destroy'])->name('suppliers.destroy');
+
+
+Route::post('suppliers/{id}/restore', [App\Http\Controllers\SupplierController::class, 'restore'])->name('suppliers.restore');
+
+

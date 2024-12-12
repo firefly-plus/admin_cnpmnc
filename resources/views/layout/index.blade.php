@@ -66,7 +66,13 @@
       </li>
       <li><a class="app-menu__item" href="category-management.html"><i class="app-menu__icon fas fa-tasks"></i>
         <span class="app-menu__label">Quản lý danh mục</span></a>
-  </li>
+      </li>
+      <li>
+        <a class="app-menu__item" href="{{ route('suppliers.index') }}">
+          <i class="app-menu__icon fas fa-tasks"></i>
+          <span class="app-menu__label">Quản lý nhà cung cấp</span>
+        </a>
+      </li> 
       <li><a class="app-menu__item" href="product-management.html"><i
             class='app-menu__icon bx bx-purchase-tag-alt'></i><span class="app-menu__label">Quản lý sản phẩm</span></a>
       </li>

@@ -24,7 +24,7 @@
             width: 90%;
         }
         .modal-dialog {
-            max-width: 90%;
+            max-width: 80%;
         }
     </style>
 @endsection
