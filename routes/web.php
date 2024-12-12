@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+include 'admin.php';
 
 Route::get('/admin', function () {
     return view('sign-in');
@@ -68,3 +69,9 @@ Route::post('/insertrole', [App\Http\Controllers\AdminController::class, 'insert
 Route::post('/deleterole', [App\Http\Controllers\AdminController::class, 'deleteRole']);
 //AI
 Route::post('/recommender', [App\Http\Controllers\RecommenderController::class, 'timSanPhamTuongTu']);
+
+
+// employee
+Route::get('/dsemployees', [App\Http\Controllers\AdminController::class, 'DanhSachEmployee']);
+Route::get('/showthemnhanvien',[App\Http\Controllers\AdminController::class,'showThemNV']);
+Route::post('/themnhanvien', [App\Http\Controllers\AdminController::class, 'themNhanVien']);

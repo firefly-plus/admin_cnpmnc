@@ -19,6 +19,7 @@ use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
+
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
@@ -62,8 +63,7 @@ class AdminController extends Controller
         $credentials = $request->only('Phone', 'Password');
        
         $employee = Employee::where('Phone', $credentials['Phone'])->first();
-        // $employee->Passwords = bcrypt('123'); 
-        // $employee->save();
+      
        
         if ($employee && Hash::check($credentials['Password'], $employee->Passwords)) {
             if($employee->isDelete==1)
@@ -647,9 +647,43 @@ class AdminController extends Controller
     
 
     
+    public function DanhSachEmployee()
+    {
+        $employees = Employee::all();
+        return response()->json($employees);
+    }
 
+    public function showThemNV(){
+       
 
+        return view('permission.add-employee');
+    }
 
+    public function themNhanVien(Request $request)
+    {
+        // Validating dữ liệu đầu vào
+        $request->validate([
+            'FullName' => 'required|string|max:255',
+            'Phone' => 'required|string|max:15|unique:employees,Phone',
+            'Passwords' => 'required|string|min:6',
+            'address' => 'nullable|string|max:255',
+            'isDelete' => 'nullable|boolean',
+        ]);
+
+      
+        $employee = Employee::create([
+            'FullName' => $request->FullName,
+            'Phone' => $request->Phone,
+            'Passwords' => Hash::make($request->Passwords), // Mã hóa mật khẩu
+            'address' => $request->address,
+            'isDelete' => $request->isDelete ?? 0, // Default value for isDelete
+            'createdAt' => now(), // Gán thời gian tạo
+            'updatedAt' => now(), // Gán thời gian cập nhật
+        ]);
+
+        // Trả về phản hồi thành công
+        return redirect()->back()->with('success', 'Thêm nhân viên thành công!');;
+    }
 
 
 

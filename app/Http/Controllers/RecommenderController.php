@@ -110,8 +110,13 @@ class RecommenderController extends Controller
             $recommendedProducts = Product::with(['subCategory', 'productImages', 'productVariations.variationdiscount'])
                 ->whereIn('id', array_column($uniqueProducts, 'ID_Product'))
                 ->get();
-
-            return response()->json($recommendedProducts);
+                $recommendedProductsIds = $recommendedProducts->pluck('id')->toArray();
+                $idString = implode(',', $recommendedProductsIds);
+                
+                // Gọi stored procedure
+                $pr = DB::select("call doan_chuyennganh1.GetProductsByIds(?)", [$idString]);
+           
+            return response()->json($pr);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             return response()->json([
