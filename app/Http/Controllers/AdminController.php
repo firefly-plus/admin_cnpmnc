@@ -19,6 +19,7 @@ use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
+
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
@@ -62,8 +63,7 @@ class AdminController extends Controller
         $credentials = $request->only('Phone', 'Password');
        
         $employee = Employee::where('Phone', $credentials['Phone'])->first();
-        // $employee->Passwords = bcrypt('123'); 
-        // $employee->save();
+      
        
         if ($employee && Hash::check($credentials['Password'], $employee->Passwords)) {
             Auth::guard('employee')->login($employee);

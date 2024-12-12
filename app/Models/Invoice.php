@@ -18,7 +18,7 @@ class Invoice extends Model
     // protected $primaryKey='invoice_id';
     // Các thuộc tính có thể gán
     protected $fillable = [
-        // 'invoice_id',
+        //'invoice_id',
         'ID_Employeer',
         'ID_User',
         'totalAmount',
