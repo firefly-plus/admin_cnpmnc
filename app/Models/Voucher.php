@@ -21,8 +21,6 @@ class Voucher extends Model
         'startDate',
         'endDate',
         'isActive',
-        'createdAt',
-        'updatedAt',
         'max_discount_amount'
     ];
 

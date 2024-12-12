@@ -3,14 +3,14 @@
 @section('css')
 <style>
 .promotion-info {
-    max-width: 800px; 
+    max-width: 800px;
     margin: 0 auto;
 }
 
 .form-row {
     display: flex;
-    justify-content: space-between; 
-    gap: 10px; 
+    justify-content: space-between;
+    gap: 10px;
     align-items: flex-start;
 }
 
@@ -46,14 +46,14 @@ input.form-control {
 
 
 .product-card {
-    flex: 1 0 21%;  
-    min-width: 200px; 
-    max-width: 210px; 
+    flex: 1 0 21%;
+    min-width: 200px;
+    max-width: 210px;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
-    padding: 10px;  
+    padding: 10px;
 }
 
 .product-card input {
@@ -105,7 +105,7 @@ select.form-control {
 @section('content')
 <div class="container">
     <!-- Phần thông tin giảm giá -->
-    <div class="promotion-info">      
+    <div class="promotion-info">
         <form id="promotion-form">
             <div class="form-row">
                 <div class="form-group">
@@ -127,7 +127,7 @@ select.form-control {
                 </div>
             </div>
         </form>
-    
+
         <!-- 3 Select Boxes -->
         <div class="form-row">
             <div class="form-group">
@@ -156,14 +156,14 @@ select.form-control {
             </div>
         </div>
     </div>
-    
-    
+
+
     <div class="product-list">
         <h3>Product List</h3>
         <input type="checkbox" id="check-all" class="check-all-checkbox"> Check All
 
         <div class="product-grid">
-            
+
         </div>
         <button type="button" id="apply-discount" class="btn btn-success">Apply Discount</button>
     </div>
@@ -171,7 +171,7 @@ select.form-control {
         <table>
             <thead>
                 <tr>
-                   
+
                     <th>Product Name</th>
                     <th>Size</th>
                     <th>Price</th>
@@ -181,32 +181,24 @@ select.form-control {
                 </tr>
             </thead>
             <tbody id="product-list-discount">
-                <tr>
-                  
-                    
-                </tr>
-                <tr>
-                   
-                </tr>
-               
             </tbody>
         </table>
     </div>
-    
+
 </div>
 @endsection
 
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script> 
+<script>
     $(document).ready(function() {
         $.ajax({
             url: '/getdiscount',
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-                $('#discount').empty(); 
+                $('#discount').empty();
 
                 $('#discount').append('<option value="">Select Discount</option>');
 
@@ -215,7 +207,7 @@ select.form-control {
                 });
             },
             error: function(xhr, status, error) {
-            
+
                 console.error('Error fetching discount data: ', error);
             }
         });
@@ -226,7 +218,7 @@ select.form-control {
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-                $('#category').empty(); 
+                $('#category').empty();
 
                 $('#category').append('<option value="">Select Category</option>');
 
@@ -235,7 +227,7 @@ select.form-control {
                 });
             },
             error: function(xhr, status, error) {
-            
+
                 console.error('Error fetching discount data: ', error);
             }
         });
@@ -246,7 +238,7 @@ select.form-control {
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-                $('#subcategory').empty(); 
+                $('#subcategory').empty();
 
                 $('#subcategory').append('<option value="">Select SubCategory</option>');
 
@@ -255,7 +247,7 @@ select.form-control {
                 });
             },
             error: function(xhr, status, error) {
-            
+
                 console.error('Error fetching discount data: ', error);
             }
         });
@@ -266,7 +258,7 @@ select.form-control {
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-                $('#product').empty(); 
+                $('#product').empty();
 
                 $('#product').append('<option value="">Select Product</option>');
 
@@ -275,7 +267,7 @@ select.form-control {
                 });
             },
             error: function(xhr, status, error) {
-            
+
                 console.error('Error fetching discount data: ', error);
             }
         });
@@ -285,10 +277,10 @@ select.form-control {
 {{-- check all cho ds chưa discount --}}
 <script>
     $(document).ready(function() {
-        var selectedProducts = []; 
+        var selectedProducts = [];
         //này check all
         $('#check-all').on('change', function() {
-            var isChecked = $(this).prop('checked'); 
+            var isChecked = $(this).prop('checked');
             $('.product-checkbox').prop('checked', isChecked);
 
             if (isChecked) {
@@ -298,12 +290,12 @@ select.form-control {
             } else {
                 selectedProducts = [];
             }
-            console.log('Selected Products:', selectedProducts); 
+            console.log('Selected Products:', selectedProducts);
         });
         //này xóa check hoặc thêm
         $(document).on('change', '.product-checkbox', function() {
-            var productId = $(this).data('product-id'); 
-            var isChecked = $(this).prop('checked'); 
+            var productId = $(this).data('product-id');
+            var isChecked = $(this).prop('checked');
 
             if (isChecked) {
                 if (!selectedProducts.includes(productId)) {
@@ -315,16 +307,16 @@ select.form-control {
                     selectedProducts.splice(index, 1);
                 }
             }
-            console.log('Selected Products:', selectedProducts); 
+            console.log('Selected Products:', selectedProducts);
         });
         //3 thàng sau này là lọc biến thể
         $(document).ready(function() {
             $('#category').on('change', function() {
                 var categoryId = $(this).val();
-                selectedProducts = []; 
+                selectedProducts = [];
                 if (categoryId) {
                     $.ajax({
-                        url: '/getproductvariationbycategory', 
+                        url: '/getproductvariationbycategory',
                         type: 'GET',
                         data: { id: categoryId },
                         dataType: 'json',
@@ -332,9 +324,9 @@ select.form-control {
                             $('.product-grid').empty();
 
                             $.each(data, function(index, variation) {
-                                
+
                                 var imageUrl = variation.product.product_images && variation.product.product_images.length > 0
-                                    ? variation.product.product_images[0].IMG_URL 
+                                    ? variation.product.product_images[0].IMG_URL
                                     : '/images/team.jpg';
 
                                 var productHtml = '<div class="product-card">' +
@@ -360,10 +352,10 @@ select.form-control {
         $(document).ready(function() {
             $('#subcategory').on('change', function() {
                 var categoryId = $(this).val();
-                selectedProducts = []; 
+                selectedProducts = [];
                 if (categoryId) {
                     $.ajax({
-                        url: '/getproductvariationbysubcategory', 
+                        url: '/getproductvariationbysubcategory',
                         type: 'GET',
                         data: { id: categoryId },
                         dataType: 'json',
@@ -371,9 +363,9 @@ select.form-control {
                             $('.product-grid').empty();
 
                             $.each(data, function(index, variation) {
-                                
+
                                 var imageUrl = variation.product.product_images && variation.product.product_images.length > 0
-                                    ? variation.product.product_images[0].IMG_URL 
+                                    ? variation.product.product_images[0].IMG_URL
                                     : '/images/team.jpg';
 
                                 var productHtml = '<div class="product-card">' +
@@ -399,10 +391,10 @@ select.form-control {
         $(document).ready(function() {
             $('#product').on('change', function() {
                 var categoryId = $(this).val();
-                selectedProducts = []; 
+                selectedProducts = [];
                 if (categoryId) {
                     $.ajax({
-                        url: '/getproductvariationbyproduct', 
+                        url: '/getproductvariationbyproduct',
                         type: 'GET',
                         data: { id: categoryId },
                         dataType: 'json',
@@ -410,9 +402,9 @@ select.form-control {
                             $('.product-grid').empty();
 
                             $.each(data, function(index, variation) {
-                                
+
                                 var imageUrl = variation.product.product_images && variation.product.product_images.length > 0
-                                    ? variation.product.product_images[0].IMG_URL 
+                                    ? variation.product.product_images[0].IMG_URL
                                     : '/images/team.jpg';
 
                                 var productHtml = '<div class="product-card">' +
@@ -486,13 +478,13 @@ select.form-control {
                 },
             });
         });
-        
+
 
     });
 
     function loadProducts() {
         $.ajax({
-            url: '/getproductvariationdiscount', 
+            url: '/getproductvariationdiscount',
             type: 'GET',
             dataType: 'json',
             success: function(data) {
@@ -526,11 +518,11 @@ select.form-control {
     $(document).ready(function() {
         function loadProducts() {
             $.ajax({
-                url: '/getproductvariationdiscount', 
+                url: '/getproductvariationdiscount',
                 type: 'GET',
                 dataType: 'json',
                 success: function(data) {
-                  
+
                     $('#product-list-discount').empty();
                     data.forEach(function(product) {
                         var row = `
@@ -557,12 +549,12 @@ select.form-control {
     });
     $(document).ready(function () {
         $(document).on('click', '.delete-discount', function () {
-            var productId = $(this).data('product-id'); 
+            var productId = $(this).data('product-id');
             console.log("Product ID: ", productId); // Kiểm tra xem ID có được log ra hay không
 
             $.ajax({
-                url: '/deletediscountbyproductvariation?id=' + productId, 
-                method: 'DELETE', 
+                url: '/deletediscountbyproductvariation?id=' + productId,
+                method: 'DELETE',
                 dataType: 'json',
                 success: function (response) {
                     if (response.message === 'Khuyến mãi đã được hủy thành công.') {

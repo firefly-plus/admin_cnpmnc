@@ -551,6 +551,7 @@ class AdminController extends Controller
         return response()->json($vouchers);
     }
 
+    
     //quản lí kho
     public function showWareHouse()
     {

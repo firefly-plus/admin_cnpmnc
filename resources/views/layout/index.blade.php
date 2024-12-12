@@ -6,6 +6,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   
 
   <!-- Main CSS-->
@@ -63,7 +64,7 @@
       <li><a class="app-menu__item" href="voucher-management.html"><i class="app-menu__icon fa-ticket"></i>
               <span>Quản lý Voucher</span></a>
       </li>
-      <li><a class="app-menu__item" href="product-management.html"><i class="app-menu__icon fas fa-tasks"></i>
+      <li><a class="app-menu__item" href="category-management.html"><i class="app-menu__icon fas fa-tasks"></i>
         <span class="app-menu__label">Quản lý danh mục</span></a>
   </li>
       <li><a class="app-menu__item" href="product-management.html"><i
