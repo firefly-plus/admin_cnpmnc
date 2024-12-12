@@ -38,7 +38,7 @@
                             <td>
                                 <div class="d-flex">
                                     <input type="number" name="import_quantity" class="form-control" style="width: 80px; margin-right: 5px;"
-                                        value="{{ $detail['ImportQuantity'] ?? 0 }}" min="0" required>
+                                        value="{{ $detail['QuantityOrdered'] ?? 0 }}" min="0" max="{{ $detail['QuantityOrdered'] ?? 0 }}" required>
                                     <button class="btn btn-primary btn-sm update-btn"
                                         data-order-id="{{ $detail['order_detail_id'] }}"
                                         data-variation-id="{{ $detail['variation_id'] }}">Update</button>
