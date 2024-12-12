@@ -13,14 +13,19 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+include 'admin.php';
 
 Route::get('/admin', function () {
     return view('sign-in');
 });
 //
 
+// Route::middleware('permission:Báo cáo & Thống kê - Xem báo cáo Layout')->group(function() {
+//     Route::get('/statistics.html', [App\Http\Controllers\AdminController::class, 'Statistics']);
+//     Route::post('/login', [App\Http\Controllers\AdminController::class, 'login']);
+// });
 
-Route::post('/login',[App\Http\Controllers\AdminController::class,'login']);
+Route::post('/login', [App\Http\Controllers\AdminController::class, 'login'])->name('login');
 Route::get('/product-management.html',[App\Http\Controllers\AdminController::class,'showProductManagement']);
 
 Route::get('/invoice-management.html',[App\Http\Controllers\AdminController::class,'showInvoice']);
@@ -28,7 +33,7 @@ Route::get('/invoice', [App\Http\Controllers\AdminController::class, 'Invoice'])
 Route::put('/updateorderstatus', [App\Http\Controllers\AdminController::class, 'updateOrderStatus']);
 Route::get('/export-pdf', [App\Http\Controllers\AdminController::class, 'exportPdf']);
 
-Route::get('/statistics.html', [App\Http\Controllers\AdminController::class, 'Statistics']);
+Route::get('/statistics.html', [App\Http\Controllers\AdminController::class, 'Statistics'])->middleware('permission:Báo cáo & Thống kê - Xem báo cáo Layout');
 Route::post('/statistics/revenue', [App\Http\Controllers\AdminController::class, 'getRevenueData'])->name('statistics.revenue');
 
 Route::get('/promotion-management.html', [App\Http\Controllers\AdminController::class, 'showPromotion']);
@@ -62,3 +67,20 @@ Route::get('warehouse/{orderSupplierId}', [App\Http\Controllers\WarehouseControl
 
 Route::post('/warehouse/update-stock', [App\Http\Controllers\WarehouseController::class, 'updateStock'])->name('warehouse.updateStock');
 //code của vương
+Route::get('/warehouse-management.html', [App\Http\Controllers\AdminController::class, 'showWareHouse']);
+
+Route::get('/permission-management.html', [App\Http\Controllers\AdminController::class, 'showPermission']);
+Route::get('/getpermission', [App\Http\Controllers\AdminController::class, 'getPermission']);
+Route::get('/getrole', [App\Http\Controllers\AdminController::class, 'getRole']);
+Route::get('/getrolepermission', [App\Http\Controllers\AdminController::class, 'getRolePermission']);
+Route::post('/updaterolepermission', [App\Http\Controllers\AdminController::class, 'updateRolePermission']);
+Route::post('/insertrole', [App\Http\Controllers\AdminController::class, 'insertRole']);
+Route::post('/deleterole', [App\Http\Controllers\AdminController::class, 'deleteRole']);
+//AI
+Route::post('/recommender', [App\Http\Controllers\RecommenderController::class, 'timSanPhamTuongTu']);
+
+
+// employee
+Route::get('/dsemployees', [App\Http\Controllers\AdminController::class, 'DanhSachEmployee']);
+Route::get('/showthemnhanvien',[App\Http\Controllers\AdminController::class,'showThemNV']);
+Route::post('/themnhanvien', [App\Http\Controllers\AdminController::class, 'themNhanVien']);

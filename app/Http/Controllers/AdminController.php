@@ -7,8 +7,11 @@ use App\Models\Discount;
 use App\Models\Employee;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
+use App\Models\Permission;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Models\Role;
+use App\Models\RolePermission;
 use App\Models\SupCategory;
 use App\Models\User;
 use App\Models\VariationDiscount;
@@ -16,9 +19,11 @@ use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
+
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 function removeAccents($str) {
@@ -55,25 +60,28 @@ class AdminController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'Phone' => 'required|digits:10',
-            'Password' => 'required|string|min:1',
+        $credentials = $request->only('Phone', 'Password');
+       
+        $employee = Employee::where('Phone', $credentials['Phone'])->first();
+      
+       
+        if ($employee && Hash::check($credentials['Password'], $employee->Passwords)) {
+            if($employee->isDelete==1)
+            {
+                return back()->withErrors([
+                    'Phone' => 'Tài Khoản Không Hoạt Động',
+                ]);
+            }
+            Auth::guard('employee')->login($employee);
+            return redirect()->intended('/statistics.html');
+        }
+    
+      
+        return back()->withErrors([
+            'Phone' => 'Thông tin đăng nhập không chính xác.',
         ]);
-        $employee = Employee::where('Phone', $request->Phone)->first();
-
-        if ($request->has('rememberMe') && $request->rememberMe == 'on') {
-            Cookie::queue('employee_id', $employee->id, 60 * 24 * 30); 
-            Cookie::queue('employee_name', $employee->FullName, 60 * 24 * 30);
-        }
-        if ($employee && Hash::check($request->Password, $employee->Passwords)) 
-        {
-            session(['employee_id' => $employee->id]); 
-            session(['employee_name' => $employee->FullName]); 
-            return redirect()->to('/statistics.html');
-        } else {
-            return back()->withErrors(['error' => 'Thông tin đăng nhập không chính xác.']);  
-        }
     }
+
 
     public function showInvoice() 
     {
@@ -556,10 +564,126 @@ class AdminController extends Controller
     {
         return view('warehouse.warehouse-management');
     }
+
+    //quản lý quyền
+    public function showPermission()
+    {
+        return view('permission.permission-management');
+    }
+
+    public function getRole()
+    {
+        $role=Role::all();
+        return response()->json($role);
+    }
+
+    public function getPermission(Request $request)
+    {
+        $name = $request->input('name', ''); 
+        $permissions = Permission::where('name', 'like', "%$name%")->get();
+        return response()->json($permissions);
+    }
+
+    public function getRolePermission(Request $request)
+    {
+        $rolepermission=RolePermission::where('role_id',$request->role_id)->get();
+        $rolepermission=$rolepermission->pluck('permission_id');
+        return response()->json($rolepermission);
+    }
+
+    public function updateRolePermission(Request $request)
+    {
+        $role_id = $request->role_id; 
+        $ds_role_permission = $request->ds_role_permission;
+        $role_permissions = RolePermission::where('role_id', $role_id)->pluck('permission_id')->toArray();
+        $permissions_to_add = array_diff($ds_role_permission, $role_permissions);
+        $permissions_to_remove = array_diff($role_permissions, $ds_role_permission);
+        foreach ($permissions_to_add as $permission_id) {
+            RolePermission::create([
+                'role_id' => $role_id,
+                'permission_id' => $permission_id,
+            ]);
+        }
+        RolePermission::where('role_id', $role_id)
+            ->whereIn('permission_id', $permissions_to_remove)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Cập nhật quyền thành công',
+            'added_permissions' => $permissions_to_add,
+            'removed_permissions' => $permissions_to_remove,
+        ], 200);
+    }
+
+    public function insertRole(Request $request)
+    {
+        // Tạo mới vai trò
+        Role::create([
+            'name' => $request->input('name'),
+            'isDelete' => $request->input('isDelete', 0), 
+            'createdAt' => $request->input('createdAt', now()), 
+            'updatedAt' => $request->input('updatedAt', now()), 
+        ]);
+    
+        // Trả về thông báo thành công
+        return response()->json(['message' => 'Role created successfully'], 201);
+    }
+
+    public function deleteRole(Request $request)
+    {
+        $role = Role::find($request->id);
+
+        if (!$role) {
+            return response()->json(['message' => 'Vai trò không tồn tại.'], 404);
+        }
+
+        // Đánh dấu vai trò là đã xóa (hoặc xóa hoàn toàn tùy theo yêu cầu)
+        $role->isDelete = 1;
+        $role->save();
+
+        return response()->json(['message' => 'Vai trò đã được xóa thành công.'], 200);
+    }
+
     
 
+    
+    public function DanhSachEmployee()
+    {
+        $employees = Employee::all();
+        return response()->json($employees);
+    }
 
+    public function showThemNV(){
+       
 
+        return view('permission.add-employee');
+    }
+
+    public function themNhanVien(Request $request)
+    {
+        // Validating dữ liệu đầu vào
+        $request->validate([
+            'FullName' => 'required|string|max:255',
+            'Phone' => 'required|string|max:15|unique:employees,Phone',
+            'Passwords' => 'required|string|min:6',
+            'address' => 'nullable|string|max:255',
+            'isDelete' => 'nullable|boolean',
+        ]);
+
+      
+        $employee = Employee::create([
+            'FullName' => $request->FullName,
+            'Phone' => $request->Phone,
+            'Passwords' => Hash::make($request->Passwords), // Mã hóa mật khẩu
+            'address' => $request->address,
+            'isDelete' => $request->isDelete ?? 0, // Default value for isDelete
+            'createdAt' => now(), // Gán thời gian tạo
+            'updatedAt' => now(), // Gán thời gian cập nhật
+        ]);
+
+        // Trả về phản hồi thành công
+        return redirect()->back()->with('success', 'Thêm nhân viên thành công!');;
+    }
 
 
 

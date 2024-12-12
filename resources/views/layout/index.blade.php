@@ -1,3 +1,11 @@
+{{-- @php
+    $permissions = session('employee_permissions')->toArray();;
+@endphp --}}
+@php
+    $permissions = session('employee_permissions', collect())->toArray();
+    // dd($permissions);
+@endphp
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -49,26 +57,42 @@
     </div>
     <hr>
     <ul class="app-menu">
-      <li><a class="app-menu__item haha" href="statistics.html"><i
-        class='app-menu__icon bx bx-pie-chart-alt-2'></i><span class="app-menu__label">Báo cáo doanh thu</span></a></li>
+      @if(in_array('Báo cáo & Thống kê - Xem báo cáo Layout', $permissions))
+        <li><a class="app-menu__item haha" href="statistics.html"><i
+          class='app-menu__icon bx bx-pie-chart-alt-2'></i><span class="app-menu__label">Báo cáo doanh thu</span></a></li>
+      @endif
+
+
+
       <li><a class="app-menu__item active" href="/invoice-management.html"><i class='app-menu__icon bx bx-task'></i><span
         class="app-menu__label">Quản lý đơn hàng</span></a></li>
       {{-- <li><a class="app-menu__item " href="table-data-table.html"><i class='app-menu__icon bx bx-id-card'></i> <span
             class="app-menu__label">Quản lý nhân viên</span></a></li> --}}
-      <li><a class="app-menu__item" href="user-management.html"><i class='app-menu__icon bx bx-user-voice'></i><span
-            class="app-menu__label">Quản lý khách hàng</span></a></li>
-      <li><a class="app-menu__item" href="promotion-management.html"><i
-              class='app-menu__icon fas fa-tags'></i><span>Quản lý khuyến mãi</span></a>
-      </li>
+      @if(in_array('Quản lý khách hàng - Xem danh sách khách hàng Layout', $permissions))
+       <li><a class="app-menu__item" href="user-management.html"><i class='app-menu__icon bx bx-user-voice'></i><span
+          class="app-menu__label">Quản lý khách hàng</span></a></li>
+      @endif
+      @if(in_array('Giảm giá - Xem giảm giá Layout', $permissions))
+        <li><a class="app-menu__item" href="promotion-management.html"><i
+          class='app-menu__icon fas fa-tags'></i><span>Quản lý khuyến mãi</span></a></li>
+      @endif
+
+
       <li><a class="app-menu__item" href="voucher-management.html"><i class="app-menu__icon fa-ticket"></i>
               <span>Quản lý Voucher</span></a>
       </li>
-      <li><a class="app-menu__item" href="product-management.html"><i class="app-menu__icon fas fa-tasks"></i>
-        <span class="app-menu__label">Quản lý danh mục</span></a>
-  </li>
-      <li><a class="app-menu__item" href="product-management.html"><i
-            class='app-menu__icon bx bx-purchase-tag-alt'></i><span class="app-menu__label">Quản lý sản phẩm</span></a>
-      </li>
+      @if(in_array('Quản lý danh mục - Xem danh mục Layout', $permissions))
+        <li><a class="app-menu__item" href="product-management.html"><i class="app-menu__icon fas fa-tasks"></i>
+          <span class="app-menu__label">Quản lý danh mục</span></a></li>
+      @endif
+      @if(in_array('Quản lý sản phẩm - Xem Sản phẩm Layout', $permissions))
+      <li><a class="app-menu__item" href="/danhsachsanpham"><i
+        class='app-menu__icon bx bx-purchase-tag-alt'></i><span class="app-menu__label">Quản lý sản phẩm</span></a></li>
+      @endif
+      @if(in_array('Quản lý kho - Xem danh sách nhập kho Layout', $permissions))
+        <li><a class="app-menu__item" href="table-data-money.html"><i class='app-menu__icon bx bx-dollar'></i><span
+          class="app-menu__label">Quản Lý Kho</span></a></li>
+      @endif
       {{-- <li><a class="app-menu__item" href="table-data-oder.html"><i class='app-menu__icon bx bx-task'></i><span
             class="app-menu__label">Quản lý đơn hàng</span></a></li> --}}
       <li><a class="app-menu__item" href="table-data-banned.html"><i class='app-menu__icon bx bx-run'></i><span
@@ -76,6 +100,8 @@
           </span></a></li>
       <li><a class="app-menu__item" href="warehouse-management.html"><i class='app-menu__icon bx bx-dollar'></i><span
             class="app-menu__label">Quản Lý Kho</span></a></li>
+=======
+
       {{-- <li><a class="app-menu__item" href="quan-ly-bao-cao.html"><i
             class='app-menu__icon bx bx-pie-chart-alt-2'></i><span class="app-menu__label">Báo cáo doanh thu</span></a>
       </li> --}}

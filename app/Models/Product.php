@@ -9,9 +9,13 @@ class Product extends Model
 {
     use HasFactory;
     protected $table = 'product';
-
+    protected $primaryKey='id';
+   
     // Các thuộc tính có thể gán
+    protected $keyType = 'string';
+    public $incrementing = false;
     protected $fillable = [
+        'id',
         'ID_SupCategory',
         'productName',
         'description',
@@ -19,6 +23,7 @@ class Product extends Model
         'createdAt',
         'updatedAt'
     ];
+    
     public function invoices()
     {
         return $this->belongsToMany(Invoice::class, 'invoicedetail', 'ID_productVariation', 'ID_Invoice');
@@ -27,11 +32,12 @@ class Product extends Model
     
 
     public function invoiceDetails()
-{
-    return $this->hasMany(InvoiceDetail::class, 'ID_productVariation');
-}
+    {
+        return $this->hasMany(InvoiceDetail::class, 'ID_productVariation');
+    }
 
 
+    public $timestamps = false;
     // Khai báo mối quan hệ với bảng 'supcategory'
     public function subCategory()
     {
@@ -41,7 +47,7 @@ class Product extends Model
     
     public function productImages()
     {
-        return $this->hasMany(ProductImage::class, 'ProductID');
+        return $this->hasMany(ProductImage::class, 'ProductID','id');
     }
 
     // Khai báo mối quan hệ với bảng 'productvariation'

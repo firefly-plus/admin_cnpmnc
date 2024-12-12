@@ -9,9 +9,13 @@ class ProductVariation extends Model
 {
     use HasFactory;
     protected $table = 'productvariation';
-
+    protected $primaryKey='id';
+    public $timestamps = false;
+    protected $keyType = 'string';
+    public $incrementing = false;
     // Các thuộc tính có thể gán
     protected $fillable = [
+        'id',
         'ID_Product',
         'size',
         'Price',

@@ -44,7 +44,7 @@
                   <p class="mb-0">Enter your email and password to sign in</p>
                 </div>
                 <div class=" card-body">
-                  <form action="/login" method="POST" role="form" autocomplete="off">
+                  <form action="{{ route('login') }}" method="POST">
                     @csrf
 
                 
@@ -74,7 +74,7 @@
                           }
                         });
                       </script> --}}
-                      <script>
+                      {{-- <script>
                         document.querySelector('form').addEventListener('submit', function (event) {
                           if (document.getElementById('rememberMe').checked) {
                            
@@ -83,7 +83,7 @@
                             document.cookie = "rememberMe=false; path=/; max-age=0"; // Xóa cookie nếu không chọn "Remember me"
                           }
                         });
-                      </script>
+                      </script> --}}
                       
                       
                       

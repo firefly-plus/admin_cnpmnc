@@ -12,7 +12,9 @@ class Invoice extends Model
     use HasFactory;
 
     protected $table = 'invoice';
-
+    protected $primaryKey='invoice_id';
+    protected $keyType = 'string';
+    public $incrementing = false;
     // protected $primaryKey='invoice_id';
     // Các thuộc tính có thể gán
     protected $fillable = [

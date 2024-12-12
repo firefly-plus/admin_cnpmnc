@@ -114,7 +114,7 @@
 </div>
 <!-- Modal Chi Tiết Hóa Đơn -->
 <div class="modal fade" id="invoiceDetailModal" tabindex="-1" role="dialog" aria-labelledby="invoiceDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="invoiceDetailModalLabel">Chi Tiết Hóa Đơn</h5>
@@ -242,7 +242,7 @@ $(document).ready(function() {
                                         <option value="Trả hàng" ${invoice.orderStatus === "Trả hàng" ? 'selected' : ''}>Trả hàng</option>
                                         <option value="Được giao" ${invoice.orderStatus === "Được giao" ? 'selected' : ''}>Được giao</option>
                                         <option value="Đã hủy" ${invoice.orderStatus === "Đã hủy" ? 'selected' : ''}>Đã hủy</option>
-                                        <option value="Đã hủy" ${invoice.orderStatus === "Đã hoàn thành" ? 'selected' : ''}>Đã hoàn thành</option>
+                                        <option value="Đã hoàn thành" ${invoice.orderStatus === "Đã hoàn thành" ? 'selected' : ''}>Đã hoàn thành</option>
                                     </select>
                                 </td>
                                 <td>
