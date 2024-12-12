@@ -1,3 +1,7 @@
+@php
+    $permissions = session('employee_permissions', collect())->toArray(); 
+    // dd($permissions);
+@endphp
 @extends('layout.index')
 @section('title','Category Management')
 @section('css')
@@ -36,7 +40,7 @@
                     <option value="Trả hàng">Trả hàng</option>
                     <option value="Được giao">Được giao</option>
                     <option value="Đã hủy">Đã hủy</option>
-                    <option value="Đã hủy">Đã hoàn thành</option>
+                    <option value="Đã hoàn thành">Đã hoàn thành</option>
                 </select>
             </div>
 
@@ -66,27 +70,22 @@
     <div class="tile">
         <div class="tile-body">
             <div class="row element-button">
-                <div class="col-sm-2">
-                    <a class="btn btn-add btn-sm" href="form-add-don-hang.html" title="Thêm"><i class="fas fa-plus"></i> Tạo mới đơn hàng</a>
-                </div>
-                <div class="col-sm-2">
-                    <a class="btn btn-delete btn-sm nhap-tu-file" type="button" title="Nhập" onclick="myFunction(this)"><i class="fas fa-file-upload"></i> Tải từ file</a>
-                </div>
-                <div class="col-sm-2">
-                    <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printTable()"><i class="fas fa-print"></i> In dữ liệu</a>
-                </div>
-                <div class="col-sm-2">
-                    <a class="btn btn-delete btn-sm print-file js-textareacopybtn" type="button" title="Sao chép"><i class="fas fa-copy"></i> Sao chép</a>
-                </div>
-                <div class="col-sm-2">
-                    <a class="btn btn-excel btn-sm" href="" title="In"><i class="fas fa-file-excel"></i> Xuất Excel</a>
-                </div>
-                <div class="col-sm-2">
-                    <a class="btn btn-delete btn-sm pdf-file" type="button" title="In" id="export-selected-pdf"><i class="fas fa-file-pdf"></i> Xuất PDF</a>
-                </div>
-                <div class="col-sm-2">
-                    <a class="btn btn-delete btn-sm" type="button" title="Xóa" onclick="myFunction(this)"><i class="fas fa-trash-alt"></i> Xóa tất cả </a>
-                </div>
+                @if(in_array('Quản lý đơn hàng - Xuất hóa đơn', $permissions))
+                    <div class="col-sm-2">
+                        <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printTable()"><i class="fas fa-print"></i> In dữ liệu</a>
+                    </div>
+                    <div class="col-sm-2">
+                        <a class="btn btn-delete btn-sm print-file js-textareacopybtn" type="button" title="Sao chép"><i class="fas fa-copy"></i> Sao chép</a>
+                    </div>
+                    <div class="col-sm-2">
+                        <a class="btn btn-excel btn-sm" href="" title="In"><i class="fas fa-file-excel"></i> Xuất Excel</a>
+                    </div>
+                    <div class="col-sm-2">
+                        <a class="btn btn-delete btn-sm pdf-file" type="button" title="In" id="export-selected-pdf"><i class="fas fa-file-pdf"></i> Xuất PDF</a>
+                    </div>
+                @endif
+                
+                
             </div>
 
             <div class="table-container">

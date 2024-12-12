@@ -2,7 +2,7 @@
 @section('title', 'Báo Cáo Doanh Thu')
 @section('css')
 <style>
-   
+
 </style>
 @endsection
 
@@ -11,10 +11,10 @@
     <!-- Sales -->
     @include('statistics.sales')
     @include('statistics.chart')
-    @include('statistics.revenue')
+    {{-- @include('statistics.revenue') --}}
 
 </div>
- 
+
 @endsection
 
 @section('js')

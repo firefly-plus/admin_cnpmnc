@@ -64,8 +64,11 @@
 
 
 
+      @if(in_array('Quản lý đơn hàng - Xem đơn hàng Layout', $permissions))
       <li><a class="app-menu__item active" href="/invoice-management.html"><i class='app-menu__icon bx bx-task'></i><span
         class="app-menu__label">Quản lý đơn hàng</span></a></li>
+      @endif
+
       {{-- <li><a class="app-menu__item " href="table-data-table.html"><i class='app-menu__icon bx bx-id-card'></i> <span
             class="app-menu__label">Quản lý nhân viên</span></a></li> --}}
       @if(in_array('Quản lý khách hàng - Xem danh sách khách hàng Layout', $permissions))
@@ -77,12 +80,14 @@
           class='app-menu__icon fas fa-tags'></i><span>Quản lý khuyến mãi</span></a></li>
       @endif
 
-
+      @if(in_array('Giảm giá - Xem giảm giá Layout', $permissions))
       <li><a class="app-menu__item" href="voucher-management.html"><i class="app-menu__icon fa-ticket"></i>
               <span>Quản lý Voucher</span></a>
       </li>
+      @endif
+
       @if(in_array('Quản lý danh mục - Xem danh mục Layout', $permissions))
-        <li><a class="app-menu__item" href="product-management.html"><i class="app-menu__icon fas fa-tasks"></i>
+        <li><a class="app-menu__item" href="/category-management.html"><i class="app-menu__icon fas fa-tasks"></i>
           <span class="app-menu__label">Quản lý danh mục</span></a></li>
       @endif
       @if(in_array('Quản lý sản phẩm - Xem Sản phẩm Layout', $permissions))
@@ -90,36 +95,30 @@
         class='app-menu__icon bx bx-purchase-tag-alt'></i><span class="app-menu__label">Quản lý sản phẩm</span></a></li>
       @endif
       @if(in_array('Quản lý kho - Xem danh sách nhập kho Layout', $permissions))
-        <li><a class="app-menu__item" href="table-data-money.html"><i class='app-menu__icon bx bx-dollar'></i><span
+        <li><a class="app-menu__item" href="/warehouse/warehouse-management.html"><i class='app-menu__icon bx bx-dollar'></i><span
           class="app-menu__label">Quản Lý Kho</span></a></li>
       @endif
-      <li><a class="app-menu__item" href="category-management.html"><i class="app-menu__icon fas fa-tasks"></i>
-        <span class="app-menu__label">Quản lý danh mục</span></a>
-      </li>
+
+
       <li>
         <a class="app-menu__item" href="{{ route('suppliers.index') }}">
           <i class="app-menu__icon fas fa-tasks"></i>
           <span class="app-menu__label">Quản lý nhà cung cấp</span>
         </a>
       </li>
-      <li><a class="app-menu__item" href="product-management.html"><i
-            class='app-menu__icon bx bx-purchase-tag-alt'></i><span class="app-menu__label">Quản lý sản phẩm</span></a>
-      </li>
+
       {{-- <li><a class="app-menu__item" href="table-data-oder.html"><i class='app-menu__icon bx bx-task'></i><span
             class="app-menu__label">Quản lý đơn hàng</span></a></li> --}}
-      <li><a class="app-menu__item" href="table-data-banned.html"><i class='app-menu__icon bx bx-run'></i><span
-            class="app-menu__label">Quản lý nội bộ
+      @if(in_array('Quản lý nhân viên - Xem danh sách nhân viên Layout', $permissions))
+          <li><a class="app-menu__item" href="/showthemnhanvien"><i class='app-menu__icon bx bx-run'></i><span
+            class="app-menu__label">Quản lý nhân viên
           </span></a></li>
-      <li><a class="app-menu__item" href="warehouse-management.html"><i class='app-menu__icon bx bx-dollar'></i><span
-            class="app-menu__label">Quản Lý Kho</span></a></li>
+      @endif
+      @if(in_array('Quản lý phân quyền - Phân quyền Layout', $permissions))
+      <li><a class="app-menu__item" href="/permission-management.html"><i class='app-menu__icon bx bx-calendar-check'></i><span
+        class="app-menu__label">Phân quyền</span></a></li>
+      @endif
 
-      {{-- <li><a class="app-menu__item" href="quan-ly-bao-cao.html"><i
-            class='app-menu__icon bx bx-pie-chart-alt-2'></i><span class="app-menu__label">Báo cáo doanh thu</span></a>
-      </li> --}}
-      <li><a class="app-menu__item" href="page-calendar.html"><i class='app-menu__icon bx bx-calendar-check'></i><span
-            class="app-menu__label">Lịch công tác </span></a></li>
-      <li><a class="app-menu__item" href="#"><i class='app-menu__icon bx bx-cog'></i><span class="app-menu__label">Cài
-            đặt hệ thống</span></a></li>
     </ul>
   </aside>
   <main class="app-content">

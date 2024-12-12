@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Discount;
 use App\Models\Employee;
+use App\Models\EmployeeRole;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\Permission;
@@ -650,19 +651,20 @@ class AdminController extends Controller
 
     public function DanhSachEmployee()
     {
-        $employees = Employee::all();
+        $employees = Employee::where('isDelete',0)->get();
+
         return response()->json($employees);
     }
 
     public function showThemNV(){
 
 
-        return view('permission.add-employee');
+        return view('permission.employee-management');
     }
 
     public function themNhanVien(Request $request)
     {
-        // Validating dữ liệu đầu vào
+
         $request->validate([
             'FullName' => 'required|string|max:255',
             'Phone' => 'required|string|max:15|unique:employees,Phone',
@@ -685,5 +687,80 @@ class AdminController extends Controller
         // Trả về phản hồi thành công
         return redirect()->back()->with('success', 'Thêm nhân viên thành công!');;
     }
+
+    public function xoaNhanVien(Request $request)
+    {
+        $employee = Employee::find($request->id);
+        if (!$employee) {
+            return response()->json(['error' => 'Không tìm thấy nhân viên!'], 404);
+        }
+        $employee->delete();
+        return response()->json(['success' => 'Xóa nhân viên thành công!'], 200);
+    }
+
+    public function layQuyenNhanVien(Request $request)
+    {
+        $employee = EmployeeRole::where('employee_id',$request->id)->get();
+
+        return response()->json($employee);
+    }
+
+    public function suaQuyenNhanVien(Request $request)
+    {
+        $selectedRoles = $request->selectedRoles;  // Mảng các quyền đã chọn
+        $selectEmployee = $request->selectEmployee;  // Mã nhân viên được chọn
+
+        // Log danh sách quyền và mã nhân viên
+        Log::info('Danh sách quyền đã chọn:', ['selectedRoles' => $selectedRoles]);
+        Log::info('Mã nhân viên:', ['selectEmployee' => $selectEmployee]);
+
+        // Lấy các quyền hiện tại của nhân viên
+        $employeeRoles = EmployeeRole::where('employee_id', $selectEmployee)->get();
+
+        // Lấy các role_id hiện tại của nhân viên
+        $currentRoles = $employeeRoles->pluck('role_id')->toArray();
+
+        // Log các quyền hiện tại
+        Log::info('Các quyền hiện tại của nhân viên:', ['currentRoles' => $currentRoles]);
+
+        // Kiểm tra nếu danh sách quyền không thay đổi (không cần cập nhật)
+        if ($selectedRoles === $currentRoles) {
+            return response()->json(['message' => 'Không có thay đổi quyền']);
+        }
+
+        // Bước 1: Xóa các quyền không còn trong danh sách mới
+        $rolesToRemove = array_diff($currentRoles, $selectedRoles);
+        if (!empty($rolesToRemove)) {
+            EmployeeRole::where('employee_id', $selectEmployee)
+                ->whereIn('role_id', $rolesToRemove)
+                ->delete();
+
+            // Log quyền bị xóa
+            Log::info('Quyền bị xóa:', ['rolesToRemove' => $rolesToRemove]);
+        }
+
+        // Bước 2: Thêm các quyền mới
+        $rolesToAdd = array_diff($selectedRoles, $currentRoles);
+        foreach ($rolesToAdd as $roleId) {
+            EmployeeRole::create([
+                'employee_id' => $selectEmployee,
+                'role_id' => $roleId,
+            ]);
+
+            // Log quyền mới được thêm
+            Log::info('Quyền mới được thêm:', ['roleId' => $roleId]);
+        }
+
+        return response()->json(['message' => 'Quyền nhân viên đã được cập nhật']);
+    }
+
+
+
+
+
+
+
+
+
 
 }
