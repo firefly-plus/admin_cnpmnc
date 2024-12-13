@@ -72,6 +72,7 @@ Route::middleware('permission:Quản lý đơn hàng - Xem đơn hàng Layout')-
     Route::put('/updateorderstatus', [App\Http\Controllers\AdminController::class, 'updateOrderStatus']);
     Route::get('/export-pdf', [App\Http\Controllers\AdminController::class, 'exportPdf']);
 });
+Route::get('/logout', [App\Http\Controllers\AdminController::class, 'logout'])->name('logout');
 
 Route::post('/login', [App\Http\Controllers\AdminController::class, 'login'])->name('login');
 Route::get('/product-management.html',[App\Http\Controllers\AdminController::class,'showProductManagement']);
@@ -117,3 +118,18 @@ Route::put('/suppliers/{id}', [App\Http\Controllers\SupplierController::class, '
 Route::patch('/suppliers/{id}', [App\Http\Controllers\SupplierController::class, 'update']);
 Route::delete('suppliers/{id}', [App\Http\Controllers\SupplierController::class, 'destroy'])->name('suppliers.destroy');
 Route::post('suppliers/{id}/restore', [App\Http\Controllers\SupplierController::class, 'restore'])->name('suppliers.restore');
+Route::get('/returns.html', [DoitraController::class, 'showAllReturns']);
+
+
+
+
+Route::middleware('permission:Quản lý kho - Xem danh sách nhập kho Layout')->group(function() {
+    Route::prefix('api')->group(function () {
+        Route::post('/doitra', [App\Http\Controllers\DoitraController::class, 'store']);
+    });
+    Route::get('/chitietdonhang/{orderSupplier_id}', [App\Http\Controllers\DoitraController::class, 'getOrderDetails']);
+    Route::get('/timkiemdoitra', [DoitraController::class, 'searchReturns']);
+    Route::post('/duyetdoitra/{id}', [DoitraController::class, 'approveReturn']);
+
+
+});

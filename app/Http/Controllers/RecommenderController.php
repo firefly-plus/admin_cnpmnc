@@ -111,12 +111,12 @@ class RecommenderController extends Controller
                 ->whereIn('id', array_column($uniqueProducts, 'ID_Product'))
                 ->get();
                 $recommendedProductsIds = $recommendedProducts->pluck('id')->toArray();
-                // $idString = implode(',', $recommendedProductsIds);
+                $idString = implode(',', $recommendedProductsIds);
 
-                // // Gọi stored procedure
-                // $pr = DB::select("call GetProductsByIds(?)", [$idString]);
+                // Gọi stored procedure
+                $pr = DB::select("call GetProductsByIds(?)", [$idString]);
 
-            return response()->json($ $recommendedProductsIds);
+            return response()->json($pr);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             return response()->json([

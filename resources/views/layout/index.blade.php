@@ -51,7 +51,7 @@
     <div class="app-sidebar__user"><img class="app-sidebar__user-avatar" src="/images/hay.jpg" width="50px"
         alt="User Image">
       <div>
-        <p class="app-sidebar__user-name"><b>Duy Nè</b></p>
+        <p class="app-sidebar__user-name"><b></b></p>
         <p class="app-sidebar__user-designation">Chào mừng bạn trở lại</p>
       </div>
     </div>
@@ -100,24 +100,30 @@
       @endif
 
 
+
+      @if(in_array('Quản lý nhà cung cấp - Xem chi tiết nhà cung cấp', $permissions))
+      <li><a class="app-menu__item" href="/showthemnhanvien"><i class='app-menu__icon bx bx-run'></i><span
+        class="app-menu__label">Quản lý nhân viên
+      </span></a></li>
+  @endif
+      {{-- <li><a class="app-menu__item" href="table-data-oder.html"><i class='app-menu__icon bx bx-task'></i><span
+            class="app-menu__label">Quản lý đơn hàng</span></a></li> --}}
+      @if(in_array('Quản lý nhân viên - Xem danh sách nhân viên Layout', $permissions))
       <li>
         <a class="app-menu__item" href="{{ route('suppliers.index') }}">
           <i class="app-menu__icon fas fa-tasks"></i>
           <span class="app-menu__label">Quản lý nhà cung cấp</span>
         </a>
       </li>
-
-      {{-- <li><a class="app-menu__item" href="table-data-oder.html"><i class='app-menu__icon bx bx-task'></i><span
-            class="app-menu__label">Quản lý đơn hàng</span></a></li> --}}
-      @if(in_array('Quản lý nhân viên - Xem danh sách nhân viên Layout', $permissions))
-          <li><a class="app-menu__item" href="/showthemnhanvien"><i class='app-menu__icon bx bx-run'></i><span
-            class="app-menu__label">Quản lý nhân viên
-          </span></a></li>
       @endif
       @if(in_array('Quản lý phân quyền - Phân quyền Layout', $permissions))
       <li><a class="app-menu__item" href="/permission-management.html"><i class='app-menu__icon bx bx-calendar-check'></i><span
         class="app-menu__label">Phân quyền</span></a></li>
       @endif
+      {{-- <li><a class="app-menu__item" href="/returns.html"><i class='app-menu__icon bx bx-transfer'></i><span
+        class="app-menu__label">Đổi hàng</span></a></li> --}}
+      <li><a class="app-menu__item" href="/logout"><i class='app-menu__icon bx bx-log-out'></i><span
+        class="app-menu__label">Log Out</span></a></li>
 
     </ul>
   </aside>

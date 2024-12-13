@@ -1,5 +1,5 @@
 @php
-    $permissions = session('employee_permissions', collect())->toArray(); 
+    $permissions = session('employee_permissions', collect())->toArray();
     // dd($permissions);
 @endphp
 @extends('layout.index')
@@ -21,7 +21,7 @@
 <div class="col-md-12">
     <div class="container">
         <!-- Dòng trạng thái đơn hàng -->
-       
+
 
         <!-- Các chức năng lọc và tìm kiếm -->
         <div class="row">
@@ -84,8 +84,8 @@
                         <a class="btn btn-delete btn-sm pdf-file" type="button" title="In" id="export-selected-pdf"><i class="fas fa-file-pdf"></i> Xuất PDF</a>
                     </div>
                 @endif
-                
-                
+
+
             </div>
 
             <div class="table-container">
@@ -104,7 +104,7 @@
                         </tr>
                     </thead>
                     <tbody id="invoice-body">
-                        
+
                     </tbody>
                 </table>
             </div>
@@ -161,21 +161,21 @@
 @section('js')
 <script>
 $(document).ready(function() {
-  
+
     function showInvoiceDetail(invoiceId) {
         console.log("Fetching invoice details for ID:", invoiceId);
 
         $.ajax({
-            url: '/invoice?id=' + invoiceId, 
+            url: '/invoice?id=' + invoiceId,
             method: 'GET',
             success: function(response) {
                 console.log("Invoice details fetched:", response);
 
                 if (response && response.length > 0) {
-              
+
                     let invoiceData = response[0];
 
-               
+
                     $('#invoice-id').text(invoiceData.invoice_id);
                     $('#invoice-voucher-code').text(invoiceData.voucherCode || 'N/A');
                     $('#invoice-phone').text(invoiceData.phoneNumber || 'N/A');
@@ -184,7 +184,7 @@ $(document).ready(function() {
                     $('#invoice-final-amount').text(invoiceData.finalAmount || '0');
                     $('#invoice-status').text(invoiceData.orderStatus || 'Chưa xác định');
 
-              
+
                     if (invoiceData.invoice_details && Array.isArray(invoiceData.invoice_details)) {
                         let invoiceDetailsHtml = '';
                         invoiceData.invoice_details.forEach(function(detail) {
@@ -202,7 +202,7 @@ $(document).ready(function() {
                         $('#invoice-details-table tbody').html('<tr><td colspan="4">No product details available.</td></tr>');
                     }
 
-             
+
                     $('#invoiceDetailModal').modal('show');
                 }
             },
@@ -212,7 +212,7 @@ $(document).ready(function() {
         });
     }
 
-    
+
     function getInvoices(filters = {}) {
         $.ajax({
             url: '/invoice',
@@ -220,7 +220,7 @@ $(document).ready(function() {
             data: filters,
             success: function(response) {
                 var tableBody = $("#invoice-body");
-                tableBody.empty(); 
+                tableBody.empty();
                 if (Array.isArray(response)) {
                     response.forEach(function(invoice) {
                         var row = `
@@ -229,7 +229,7 @@ $(document).ready(function() {
                                 <td>${invoice.invoice_id}</td>
                                 <td>${invoice.voucherCode || 'N/A'}</td>
                                 <td>${invoice.phoneNumber || 'N/A'}</td>
-                                <td>${invoice.address || 'N/A'}</td>
+                                <td>${invoice.shippingAddress || 'N/A'}</td>
                                 <td>${invoice.paymentMethod || 'N/A'}</td>
                                 <td>${invoice.totalAmount || '0'}</td>
                                 <td>
@@ -250,14 +250,14 @@ $(document).ready(function() {
                             </tr>`;
                         tableBody.append(row);
                     });
-  
+
                     $(".order-status").on("change", function() {
                         var invoiceId = $(this).data("id");
                         var newStatus = $(this).val();
                         updateOrderStatus(invoiceId, newStatus);
                     });
 
-                
+
                     $(".view-detail").on("click", function() {
                         var invoiceId = $(this).data("id");
                         showInvoiceDetail(invoiceId);
@@ -272,7 +272,7 @@ $(document).ready(function() {
         });
     }
 
-   
+
     function updateOrderStatus(invoiceId, newStatus) {
         $.ajax({
             url: '/updateorderstatus',
@@ -280,7 +280,7 @@ $(document).ready(function() {
             data: { invoice_id: invoiceId, orderStatus: newStatus },
             success: function(response) {
                 console.log("Order status updated successfully:", response);
-              
+
                 getInvoices();
             },
             error: function(xhr, status, error) {
@@ -289,7 +289,7 @@ $(document).ready(function() {
         });
     }
 
-   
+
     function getFilterValues() {
         return {
             createdAt: $('#filter-date').val(),
@@ -298,14 +298,14 @@ $(document).ready(function() {
         };
     }
 
-   
+
     $("#filter-date, #filter-status, #filter-price").on("change", function() {
         const filters = getFilterValues();
         console.log(filters);
         getInvoices(filters);
     });
 
-    
+
     $("#search-button").on("click", function() {
         const searchValue = $("#search-invoice").val().trim();
         if (searchValue) {
@@ -315,7 +315,7 @@ $(document).ready(function() {
         }
     });
 
-    
+
     getInvoices();
 });
 

@@ -21,10 +21,10 @@ class CheckPermission
     {
         $employee = Auth::guard('employee')->user();
         if (!$employee) {
-            return redirect('/login')->withErrors('Bạn cần đăng nhập để truy cập');
+            return redirect('/')->withErrors('Bạn cần đăng nhập để truy cập');
         }
         $emp=Employee::find($employee->id);
-       
+
         $permissions = $emp->roles()
             ->with('permissions')
             ->get()
@@ -33,10 +33,10 @@ class CheckPermission
             ->pluck('name')
             ->unique();
 
-        
+
         session()->forget('employee_permissions');
         session()->put('employee_permissions', $permissions);
-        
+
 
         // Kiểm tra quyền có trong danh sách quyền của nhân viên
         if (!$permissions->contains($permission)) {

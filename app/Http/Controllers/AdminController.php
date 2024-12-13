@@ -84,6 +84,19 @@ class AdminController extends Controller
         ]);
     }
 
+    public function logout(Request $request)
+{
+    // Đăng xuất user hiện tại
+    Auth::guard('employee')->logout();
+
+    // Xóa phiên hiện tại
+    session()->forget('employee_permissions');
+
+    // Điều hướng người dùng về trang login hoặc trang chủ
+    return redirect('/')->with('message', 'Đăng xuất thành công.');
+}
+
+
 
     public function showInvoice()
     {
