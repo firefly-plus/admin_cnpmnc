@@ -32,7 +32,7 @@ class CheckPermission
             ->flatten()
             ->pluck('name')
             ->unique();
-
+        
         
         session()->forget('employee_permissions');
         session()->put('employee_permissions', $permissions);
