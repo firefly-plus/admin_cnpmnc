@@ -183,20 +183,10 @@ select.form-control {
             <tbody id="product-list-discount">
                 <tr>
                   
-                    <td>Vải thổ cẩm</td>
-                    <td>L</td>
-                    <td>180000.00</td>
-                    <td>30</td>
-                    <td><img src="https://res.cloudinary.com/dkcizqsb3/image/upload/v1731226702/vb9pshh6ky3krifvo6mc.jpg" alt="Vải thổ cẩm" width="100"></td>
-                    <td>Vải thổ cẩm với họa tiết truyền thống của dân tộc.</td>
+                    
                 </tr>
                 <tr>
-                    <td>Tranh dân gian Đông Hồ</td>
-                    <td>M</td>
-                    <td>150000.00</td>
-                    <td>50</td>
-                    <td><img src="https://res.cloudinary.com/dkcizqsb3/image/upload/v1731234383/pwgstuca2ml2oq6pirik.jpg" alt="Tranh dân gian Đông Hồ" width="100"></td>
-                    <td>Tranh Đông Hồ với hình ảnh gần gũi và ý nghĩa.</td>
+                   
                 </tr>
                
             </tbody>

@@ -3,122 +3,318 @@
    
 @endphp
 @extends('layout.index')
+@section('title', 'Danh sách sản phẩm')
 
-@section('title', 'Quản lý sản phẩm')
+@section('css')
+    <!-- Thêm CSS tùy chỉnh nếu cần -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .wrapper {
+            min-height: 100vh;
+            padding: 0 30px;
+        }
+
+        /* css của row_action */
+        .row_action {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #8a8a8a;
+            padding: 10px 0;
+        }
+
+        .btn_excel {
+            background-color: #ffffff;
+            border: 2px solid #1ac100;
+            color: #1ac100;
+            padding: 5px 10px;
+            margin-right: 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all .1s linear;
+        }
+
+        .btn_excel:hover {
+            background-color: #1ac100;
+            color: #ffffff;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+        }
+
+        .btn_addproduct {
+            background-color: #18a103;
+            color: #ffffff;
+            border: 2px solid #1ac100;
+            border-radius: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .btn_addproduct:hover {
+            background-color: #ffffff;
+            color: #18a103;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+        }
+
+        .col_showproduct {
+            text-align: end;
+        }
+
+        .col_showproduct label {
+            margin-right: 20px;
+            font-size: 1.2rem;
+        }
+
+        .col_showproduct select {
+            padding: 4px 10px;
+        }
+
+        /* css của row search + filter */
+        .row__searchFilter {
+            margin-top: 20px;
+        }
+
+        .form_search .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .form_search input {
+            width: 100%;
+            padding-right: 40px;
+            padding-left: 10px;
+            height: 40px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form_search i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .col-filter {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .form_filter select {
+            padding: 4px 10px;
+        }
+
+        /* khúc này là css của bảng sản phẩm*/
+        .row-data {
+            margin-top: 40px;
+        }
+
+        .header_table {
+            background-color: #22009e;
+            color: #fff;
+        }
+
+        .img_product img {
+            width: 40px;
+            height: 40px;
+        }
+
+
+        .btn__edit-product,
+        .btn__delete-product,
+        .btn__view-variant {
+            border-radius: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+            background-color: #fff;
+        }
+
+        .btn__edit-product i,
+        .btn__delete-product i {
+            margin-right: 5px;
+        }
+
+
+        .btn__edit-product {
+            border: 1px solid #119000;
+            color: #119000;
+            margin-right: 20px;
+        }
+
+        .btn__delete-product {
+            border: 1px solid #ff2929;
+            color: #ff2929;
+        }
+
+        .btn__view-variant {
+            border: 1px solid #ff9900;
+            color: #ff9900;
+        }
+
+        /* nảy của modal sửa sp */
+        .customer__modal-info {
+            max-width: 1000px;
+            margin-top: -50px;
+        }
+
+        .product-des {
+            min-height: 200px;
+            width: 100%;
+        }
+
+        .form__input-product {
+            padding: 0 30px;
+        }
+
+        .form__input-product input {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        /* này css của cái modal dnh sách biến thể của sp */
+        .custom__modal {
+            max-width: 1100px;
+            margin-top: -50px;
+            margin-right: 130px;
+        }
+
+        .modal-content {
+            padding: 20px 10px;
+        }
+
+        .modal__title-detailVariant {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #656565;
+        }
+
+        .modal__title-detailVariant h5 {
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+
+        .modal__title-detailVariant span {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .header__table-variant {
+            background: #ccc;
+            border: 1px solid #ccc;
+        }
+
+        .btn__save-variant,
+        .btn__edit-variant,
+        .btn__add-variant,
+        .btn__update-product {
+            margin-top: 20px;
+            border-radius: 10px;
+            padding: 5px 10px;
+            color: #fff;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all .1s linear;
+        }
+
+        .btn__save-variant {
+            margin-left: 20px;
+            background-color: rgb(0, 197, 36);
+            border: 1px solid rgb(0, 197, 36);
+        }
+
+        .btn__save-variant:disabled {
+            background-color: #ccc;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .btn__add-variant, .btn__update-product {
+            margin-left: 20px;
+            background-color: rgb(0, 197, 36);
+            border: 1px solid rgb(0, 197, 36);
+        }
+
+        .btn__save-variant i {
+            margin-right: 5px;
+        }
+
+        .btn__edit-variant {
+            background-color: #3e37ff;
+            border: 1px solid #3e37ff;
+        }
+
+        .btn__edit-variant:hover {
+            background-color: #fff;
+            color: #3e37ff;
+            box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        }
+
+        .btn__close-modal {
+            margin-top: 20px;
+            text-align: end;
+        }
+
+        .table__data-variant {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+        }
+
+        .table__data-variant thead {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .btn__detele-variant {
+            cursor: pointer;
+        }
+        #variant-table input[type="number"] {
+            max-width: 100px;
+        }
+        .input-group {
+            max-width: 200px;
+        }
+    </style>
+
+@endsection
 
 @section('content')
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Quản lý sản phẩm</h2>
-        
-        @if(in_array('Quản lý sản phẩm - Thêm nhiều sản phẩm', $permissions))
-            <a href="{{ url('/showthemsanpham') }}" class="btn btn-primary" >Thêm sản phẩm mới</a>
-        @endif
-    </div>
-   
+    <div class="col-md-12 wrapper">
 
-   
+        {{-- phần thêm sản phẩm + show sản phẩm --}}
+        <div class="row row_action">
+            <div class="col-md-8">
+                <button class="btn_excel"><i class="fa-solid fa-file-excel"></i> Nhập từ Excel</button>
+                <button class="btn_excel"><i class="fa-solid fa-file-excel"></i> Xuất ra Excel</button>
+                <button class="btn_addproduct"> + Thêm sản phẩm</button>
+            </div>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Hình ảnh</th>
-                <th>Tên sản phẩm</th>
-                <th>Giá</th>
-                <th>Danh mục</th>
-                <th>Số lượng</th>
-                <th>Trạng thái</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($products as $product)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>
-                        @if ($product->productImages->isNotEmpty())
-                            <img src="{{ $product->productImages->first()->IMG_URL }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
-                            {{-- @foreach ($product->productImages->skip(1) as $image)
-                                <img src="{{ $image->IMG_URL }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
-                            @endforeach --}}
-                        @else
-                            <span>Không có hình ảnh</span>
-                        @endif
-                    </td>
-                    <td>{{ $product->productName }}</td>
-                    <td>
-                        @if ($product->productVariations->isNotEmpty())
-                            {{ number_format($product->productVariations->min('Price'), 0, ',', '.') }}₫
-                        @else
-                            <span>Chưa có giá</span>
-                        @endif
-                    </td>
-                    <td>{{ $product->subCategory->SupCategoryName ?? 'Không rõ' }}</td>
-                    <td>
-                        @if ($product->productVariations->isNotEmpty())
-                            {{ $product->productVariations->sum('stock') }}
-                        @else
-                            <span>Chưa có</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if ($product->isDelete == 0)
-                            <span class="badge bg-success">Còn bán</span>
-                        @else
-                            <span class="badge bg-secondary">Ngưng bán</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if(in_array('Quản lý sản phẩm - Chỉnh sửa sản phẩm', $permissions))
-                            <a href="javascript:void(0);" 
-                                class="btn btn-warning btn-sm edit-btn" 
-                                data-id="{{ $product->id }}" 
-                                data-name="{{ $product->productName }}" 
-                                data-price="{{ $product->productVariations->pluck('Price')->implode(', ') }}" 
-                                data-stock="{{ $product->productVariations->pluck('stock')->implode(', ') }}" 
-                                data-size="{{ $product->productVariations->pluck('size')->implode(', ') }}"
-                                data-description="{{ $product->description ?? '' }}">
-                                Sửa
-                            </a>
-                        @endif
-                        <form action="{{ url('/xoasanpham/' . $product->id) }}" method="POST" class="d-inline-block">
-                            @csrf
-                            @method('DELETE')
-                            @if(in_array('Quản lý sản phẩm - Xóa sản phẩm', $permissions))
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">
-                                    Xóa
-                                </button>
-                            @endif
-                            
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="7" class="text-center">Không có sản phẩm nào</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+            <div class="col-md-4 col_showproduct">
+                <label>Số lượng sản phẩm hiển thị:</label>
+                <select id="user-filter" class="dropdown">
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        </div>
 
-    <div class="d-flex justify-content-center  mt-3">
-        {{ $products->links('vendor.pagination.bootstrap-4') }}
-    </div>
-    
-</div>
-
-
-<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form id="editProductForm" method="POST" action="/suasanpham" enctype="multipart/form-data">
-                @csrf
-                @method('POST')
-                <input type="hidden" name="productId" id="productId">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editProductModalLabel">Chỉnh sửa sản phẩm</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        {{-- phần search + lọc sản phẩm --}}
+        <div class="row row__searchFilter">
+            <div class="col-md-6">
+                {{-- search --}}
+                <div class="form_search">
+                    <form>
+                        <div class="search-container">
+                            <input type="text" placeholder="Tìm kiếm sản phẩm..." />
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-body">
                     <!-- Tên sản phẩm -->
